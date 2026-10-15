@@ -1,0 +1,9 @@
+{ config, lib, ... }:
+{
+  # i5-13400 / Intel UHD 730: bring up KMS before the Plymouth splash.
+  boot.initrd.kernelModules = lib.mkIf config.my.features.graphicalBoot.enable [ "i915" ];
+  # Keep the already-tested PSR workaround while isolating the DRRS change.
+  boot.kernelParams = [ "i915.enable_psr=0" ];
+  # Preserved Windows installations use a local-time RTC (observed +08:00).
+  time.hardwareClockInLocalTime = true;
+}

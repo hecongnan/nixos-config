@@ -1,0 +1,27 @@
+result*
+.work/
+*.qcow2
+*.log
+
+# Local build and editor artifacts
+.direnv/
+__pycache__/
+*.py[cod]
+*.swp
+*.swo
+*.qcow2
+# Private local material; encrypted .age/.sops.* may be tracked deliberately
+.env
+.env.*
+!.env.example
+secrets/local/
+private/
+*.key
+*.pem
+id_rsa
+id_ed25519
+*.hash
+credentials.json
+*.sqlite
+*.sqlite3
+*.db

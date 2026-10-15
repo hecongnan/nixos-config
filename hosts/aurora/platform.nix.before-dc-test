@@ -1,0 +1,9 @@
+{ config, lib, ... }:
+{
+  # i5-13400 / Intel UHD 730: bring up KMS before the Plymouth splash.
+  boot.initrd.kernelModules = lib.mkIf config.my.features.graphicalBoot.enable [ "i915" ];
+  # Avoid idle-screen blanking caused by eDP panel self-refresh transitions.
+  boot.kernelParams = [ "i915.enable_psr=0" ];
+  # Preserved Windows installations use a local-time RTC (observed +08:00).
+  time.hardwareClockInLocalTime = true;
+}

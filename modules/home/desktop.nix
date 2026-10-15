@@ -1,0 +1,100 @@
+{ config, lib, pkgs, inputs, osConfig, ... }:
+let
+  json = pkgs.formats.json { };
+  settings = json.generate "aurora-dms-settings.json" {
+    configVersion = 18;
+    clockFormat = "24h";
+    currentThemeName = "purple";
+    cursorSettings = { theme = "Bibata-Modern-Ice"; size = 24; };
+    launchPrefix = "systemd-run --user --collect --no-block --";
+    runDmsMatugenTemplates = false;
+    runUserMatugenTemplates = false;
+    syncModeWithPortal = false;
+  };
+  session = json.generate "aurora-dms-session.json" {
+    configVersion = 4;
+    isLightMode = false;
+    wallpaperPath = "${config.home.homeDirectory}/.background/wallpaper.svg";
+    terminalOverride = "kitty";
+  };
+  initialize = pkgs.writeShellApplication {
+    name = "initialize-aurora-dms";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = ''
+      settings_dir=${lib.escapeShellArg "${config.xdg.configHome}/DankMaterialShell"}
+      state_dir=${lib.escapeShellArg "${config.xdg.stateHome}/DankMaterialShell"}
+      fragments_dir=${lib.escapeShellArg "${config.xdg.configHome}/niri/dms"}
+      install -d -m 700 "$settings_dir" "$state_dir" "$fragments_dir"
+      if [ ! -e "$settings_dir/settings.json" ]; then
+        install -m 600 ${settings} "$settings_dir/settings.json"
+      fi
+      if [ ! -e "$state_dir/session.json" ]; then
+        install -m 600 ${session} "$state_dir/session.json"
+      fi
+      for name in colors layout alttab binds cursor outputs windowrules wpblur input; do
+        if [ ! -e "$fragments_dir/$name.kdl" ]; then
+          install -m 600 /dev/null "$fragments_dir/$name.kdl"
+        fi
+      done
+      install -d -m 700 ${lib.escapeShellArg "${config.home.homeDirectory}/Pictures/Screenshots"}
+    '';
+  };
+in
+{
+  imports = [ inputs.dms.homeModules.dank-material-shell ];
+  programs.dank-material-shell = {
+    enable = true;
+    package = pkgs.dms-shell;
+    quickshell.package = pkgs.quickshell;
+    systemd.enable = true;
+    systemd.target = "graphical-session.target";
+    enableCalendarEvents = false;
+    enableVPN = false;
+    enableDynamicTheming = false;
+    enableAudioWavelength = false;
+  };
+  home.file.".background/wallpaper.svg".source = ../../assets/wallpaper.svg;
+  home.pointerCursor = {
+    enable = true;
+    package = pkgs.bibata-cursors;
+    name = "Bibata-Modern-Ice";
+    size = 24;
+    gtk.enable = true;
+    x11.enable = true;
+  };
+  gtk = {
+    enable = true;
+    iconTheme = { name = "Adwaita"; package = pkgs.adwaita-icon-theme; };
+  };
+  qt = { enable = true; platformTheme.name = "qtct"; };
+  home.packages = with pkgs; [ papirus-icon-theme adw-gtk3 satty grim slurp xwayland-satellite ];
+  home.sessionVariables.QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
+  systemd.user.sessionVariables.QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
+  xdg.configFile."niri/config.kdl".source = ../../assets/niri.kdl;
+  xdg.configFile."niri/computer-use.kdl" = lib.mkIf osConfig.my.features.computerUse.enable {
+    source = ../../assets/computer-use.kdl;
+  };
+  home.activation.initializeDms = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    run ${lib.getExe initialize}
+  '';
+  systemd.user.services.dms = {
+    Unit = { After = [ "niri.service" ]; Requisite = [ "niri.service" ]; };
+    Service = {
+      ExecStartPre = lib.getExe initialize;
+      Environment = [ "QT_QPA_PLATFORM=wayland" "QT_QPA_PLATFORMTHEME=qt5ct" "QT_QPA_PLATFORMTHEME_QT6=qt6ct" ];
+    };
+  };
+  # Native niri integration launches Xwayland satellite on demand.
+  services.swayidle = {
+    enable = true;
+    timeouts = [
+      { timeout = 300; command = "${pkgs.dms-shell}/bin/dms ipc call lock lock"; }
+      { timeout = 600; command = "${pkgs.niri}/bin/niri msg action power-off-monitors";
+        resumeCommand = "${pkgs.niri}/bin/niri msg action power-on-monitors"; }
+    ];
+    events = {
+      before-sleep = "${pkgs.dms-shell}/bin/dms ipc call lock lock";
+      lock = "${pkgs.dms-shell}/bin/dms ipc call lock lock";
+    };
+  };
+}

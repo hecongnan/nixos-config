@@ -1,0 +1,269 @@
+{
+  "elements": {
+    "btop": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.btop",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/bvxzrvhzmkmd8cc3m21b2w34kmqcjfpi-btop-1.4.7"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "fastfetch": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.fastfetch",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 4,
+      "storePaths": [
+        "/nix/store/00pz3vg9h2b9fybn5qpyrs0szilm02mg-fastfetch-2.69.0-man",
+        "/nix/store/hnb5gczfr4hgv6zjhk45xxs3f3irijzx-fastfetch-2.69.0"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "ffmpeg": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.ffmpeg",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/jzmlspv69xcby6bi634lj8xqfwavdjy8-ffmpeg-9.0.1-bin",
+        "/nix/store/khgim81njkhfqrazp047mgrc7vc9yx9s-ffmpeg-9.0.1-man"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "google-chrome": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.google-chrome",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/ds7933z0wp7872ic6zqzrwsbpj0m8g6l-google-chrome-154.0.8037.97"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "gpu-screen-recorder": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.gpu-screen-recorder",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/y5ds1msxbkzxazyyq099n1kkrkibwlaq-gpu-screen-recorder-6.1.2"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "imagemagick": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.imagemagick",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/s13s3r3pi67vj27s6ca7pbrxs2z4zjf6-imagemagick-7.1.2-31"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "img2pdf": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.img2pdf",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/5mpiqmi4ypgfwivv1z2kqg98g0flf162-python3.14-img2pdf-0.6.3"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "libreoffice": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.libreoffice",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": -10,
+      "storePaths": [
+        "/nix/store/gpmxgr6l4mmgmhz8v9p2860fgw0mpi06-libreoffice-26.8.0.3-wrapped"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "neovim": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.neovim",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 4,
+      "storePaths": [
+        "/nix/store/2q27asz53bjk6spzk6dxckw2pvf9bqpy-neovim-0.12.5"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "nodejs": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.nodejs",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/gxq2cd70i077rah1d4hkzc1lpq8q4pv8-nodejs-24.21.0"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "nvim-system-tools": {
+      "active": true,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/kdmd9nfq460pr6ml28imya4xk6d18ajs-nvim-system-tools"
+      ]
+    },
+    "qq": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.qq",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/karx6nrygrn3r3lf7w91qs7pva4a1zrn-qq-3.2.34-2026-09-24"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "scrcpy": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.scrcpy",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/pwz71fi1nlsa7vri967nq4iva1wq43a8-scrcpy-4.1"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "tesseract": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.tesseract",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 10,
+      "storePaths": [
+        "/nix/store/mfjp31yynz93kb63gi9pplh7xvr9nqzs-tesseract-5.5.3"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "vim": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.vim",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/9swnd5pf8p8w1gwcbhdpm2yx705kbp38-vim-9.2.1001",
+        "/nix/store/ph9d6ahk0ijjb12ha4x0psh0n8zrshgh-vim-9.2.1001-xxd"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "vlc": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.vlc",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/0yyvvk01jp7nyig5q1h058p1q2r6y6bz-vlc-3.0.24-man",
+        "/nix/store/s5q6s4vj4cr9b0k0id189yay0ajhd4ia-vlc-3.0.24"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "vscode": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.vscode",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/cfx4yz0xx7lcvcci5dw4s0x928cvzw38-vscode-1.139.1"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "wechat-uos": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.wechat-uos",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/r1rlwfqrq3z5pvsa867jd86jkah6zgjm-wechat-uos-4.1.1.7"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "wf-recorder": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.wf-recorder",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/fcb5r12yla0lcdwn0x22s4a1z4ajlbxz-wf-recorder-0.6.0"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "wireshark": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.wireshark",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/jxhfvpsq3dwal77ncxikp5csr13xwvnf-wireshark-qt-4.6.9"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "wpsoffice": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.wpsoffice",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/wdvcx9jaaqypg8mddqfi7zjyb8pig3an-wpsoffice-11.1.0.11723"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    },
+    "zbar": {
+      "active": true,
+      "attrPath": "legacyPackages.x86_64-linux.zbar",
+      "originalUrl": "flake:nixpkgs",
+      "outputs": null,
+      "priority": 5,
+      "storePaths": [
+        "/nix/store/0qykg1csxll4nwmj5h5h85afamqy1wn6-zbar-0.23.93",
+        "/nix/store/1c27izkcxrffhivbnzjk95r1p725cywx-zbar-0.23.93-man"
+      ],
+      "url": "path:/nix/store/j6rcqixqgga93i5h9imw50l1xaqx0pn0-source?lastModified=0&narHash=sha256-MFBjw66d4h06MvpW6lIl7RwarLteD0sk859CncGwb1Q%3D",
+      "portableSource": "github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4"
+    }
+  },
+  "version": 3
+}
