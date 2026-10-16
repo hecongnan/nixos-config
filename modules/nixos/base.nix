@@ -1,7 +1,7 @@
 { config, lib, pkgs, inputs, ... }:
 let
   cfg = config.my.machine;
-  maintenanceKey = lib.removeSuffix "\n" (builtins.readFile ../keys/maintenance.pub);
+  maintenanceKey = lib.removeSuffix "\n" (builtins.readFile ../../keys/maintenance.pub);
 in
 {
   options.my.machine = {
@@ -68,7 +68,7 @@ in
       useUserPackages = true;
       backupFileExtension = "hm-backup";
       extraSpecialArgs = { inherit inputs; };
-      users.${cfg.username} = import ./home;
+      users.${cfg.username} = import ../home;
     };
 
     # Keep this initial compatibility version when upgrading nixpkgs.

@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  package = pkgs.callPackage ../pkgs/flclash { };
+  package = pkgs.callPackage ../../pkgs/flclash { };
   username = config.my.machine.username;
 in
 {

@@ -10,14 +10,14 @@
     ./hardware-configuration.nix
     ./platform.nix
     ./display.nix
-    ../../modules/base.nix
-    ../../modules/desktop.nix
-    ../../modules/greeter.nix
-    ../../modules/graphical-boot
-    ../../modules/computer-use
-    ../../modules/features.nix
-    ../../modules/flclash.nix
-    ../../modules/disk.nix
+    ../../modules/nixos/base.nix
+    ../../modules/nixos/desktop.nix
+    ../../modules/nixos/greeter.nix
+    ../../modules/nixos/graphical-boot
+    ../../modules/nixos/computer-use
+    ../../modules/nixos/features.nix
+    ../../modules/nixos/flclash.nix
+    ../../modules/nixos/disk.nix
     inputs.disko.nixosModules.disko
     inputs.home-manager.nixosModules.home-manager
   ];
