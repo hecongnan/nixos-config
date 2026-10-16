@@ -2,7 +2,7 @@
 {
   imports = [
     ../../modules/nixos/docker.nix
-    ../../oseasy-video-nixos/nixos/classroom.nix
+    ./classroom.nix
   ] ++ [
     ./boot.nix
     ./machine.nix
