@@ -2,7 +2,8 @@
 
 Aurora 的个人 NixOS 配置：使用 Flake 锁定依赖，以 NixOS 模块管理系统，
 以集成式 Home Manager 管理用户环境，使用 Git 保存变更历史。
-当前 checkout 位于 `~/src/aurora-nixos`；GitHub 项目名称计划为 `nixos-config`，尚未创建远端。
+当前 checkout 位于 `~/src/aurora-nixos`；远端为 GitHub 私有仓库
+[hecongnan/nixos-config](https://github.com/hecongnan/nixos-config)，本地 remote 名称为 `origin`。
 
 ## 当前入口与验证状态
 
@@ -156,6 +157,7 @@ Docker volumes/bind mounts 和实际服务数据。系统密码文件、NetworkM
 需按权限单独准备；新设备通常重新生成主机身份。完整清单见 [RESTORE.md](RESTORE.md)。
 
 公钥和软件校验 hash 不是私钥；内网地址、设备标识及部署历史仍需上传前审核。
-`.gitignore` 不会清除已跟踪文件或 Git 历史。仓库尚无 remote，也没有上传。
+`.gitignore` 不会清除已跟踪文件或 Git 历史。远程仓库保持 Private，推送前复查文件与提交历史。
+GitHub CLI 通过浏览器认证；认证信息保留在仓库外，不把 Token 写入 remote URL 或配置源码。
 
 本次软件声明化的逐项核对与验收边界见 [profile 迁移记录](docs/profile-migration-2026-10-16.md)。

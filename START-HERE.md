@@ -82,8 +82,9 @@ DMS 设置、`~/.config/niri/dms`、FlClash 订阅、Rime 用户词库和 Atuin 
 
 ## 保存副本与隐私
 
-目前没有 Git remote，尚未完成加密数据备份、独立密钥保管或离线恢复演练。
-本地 Git 历史不能抵抗磁盘损坏。下一步应保存异地源码副本、系统和用户 profile 运行闭包，
+源码远端为 GitHub 私有仓库 `hecongnan/nixos-config`，本地 remote 名称为 `origin`。
+尚未完成加密数据备份、独立密钥保管或离线恢复演练。
+GitHub 远端用于保存异地源码；还需另行归档系统和用户环境运行闭包，
 并建立带独立恢复密钥的数据加密备份，参见 `RESTORE.md`。
 
 私钥、API Key、密码哈希、订阅、Wi-Fi 凭据、浏览器资料与聊天数据库不以明文提交。
