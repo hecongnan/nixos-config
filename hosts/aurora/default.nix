@@ -1,6 +1,9 @@
-{ inputs, config, pkgs, lib, ... }:
+{ inputs, lib, ... }:
 {
-  imports = [ ../../oseasy-video-nixos/nixos/classroom.nix ] ++ [
+  imports = [
+    ../../modules/nixos/docker.nix
+    ../../oseasy-video-nixos/nixos/classroom.nix
+  ] ++ [
     ./machine.nix
     ./features.nix
     ./hardware-configuration.nix
@@ -38,7 +41,4 @@
       '';
     };
   };
-  virtualisation.docker.enable = true;
-  environment.systemPackages = [ pkgs.docker-compose ];
-  users.users.${config.my.machine.username}.extraGroups = [ "docker" ];
 }
