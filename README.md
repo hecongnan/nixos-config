@@ -1,5 +1,22 @@
 # Aurora NixOS 桌面
 
+当前状态更新于 2026-10-16。日常维护先读 [START-HERE.md](START-HERE.md)，
+恢复边界和准备项见 [RESTORE.md](RESTORE.md)。本文后半保留带日期的历史部署记录；
+历史成功记录不代表当前配置或完整数据恢复已经通过验证。
+
+## 当前基线与验证状态
+
+- Git 基线 `fe35ab0` 的主机配置离线求值结果，与运行和已启动系统一致：
+  `/nix/store/vyynh7s95ab97148vk1qhz4sk1rasi90-nixos-system-aurora-26.11.20261006.151fa4e`。
+  这不是一次从零构建或灾难恢复验证。
+- 当前使用 UEFI GRUB，5 秒菜单、3 个引导代际；不再使用首次安装时的 systemd-boot。
+- 已增加 Docker/docker-compose、课堂视频本地模块、自定义面板 EDID 和 i915 PSR 绕过设置。
+- 用户 profile 另有 22 项软件；实际 Neovim 已是可写 LazyVim 环境，未完整纳入仓库。
+- 当前 `nix flake check --offline --no-write-lock-file --no-build` 在 installation 检查失败：
+  `boot.loader.grub.efiInstallAsRemovable` 要求关闭 `boot.loader.efi.canTouchEfiVariables`。
+  测试配置待修复，尚未重新执行完整构建/VM 安装测试。
+- 尚未部署 Git 远端、完整加密数据备份、离线恢复包或干净环境恢复演练。
+
 独立维护的最小桌面，以原配置的桌面集成为蓝本，不依赖原仓库或其中的凭据。
 用户名和主机名均为 `aurora`，目标为原 `hcn@10.115.4.26` 的 x86_64 机器。
 硬件为 i5-13400、Intel UHD 730、8 GiB 内存、FORESEE 512 GB NVMe，使用 UEFI。
@@ -16,11 +33,13 @@
 | 启用 | Nautilus、归档管理器、图片/PDF 查看器、简单文本编辑器、U 盘自动挂载 |
 | 保留关闭开关 | nix-ld、AppImage、direnv、增强终端工具、手机互联 |
 | 省略 | Flatpak、Tailscale、打印、DMS 搜索后端、计算器/翻译/番茄钟/日历扩展 |
-| 省略 | 小鹤、DAE、个人词库、EasyEffects、Steam、虚拟化、Syncthing、投屏、aria2、Wireshark、Mosh |
+| 主机启用 | Docker、docker-compose、课堂视频模块（独立于 features 开关） |
+| 未在基础桌面声明 | 小鹤、DAE、个人词库、EasyEffects、Steam、Syncthing、投屏、aria2、Wireshark、Mosh；Wireshark 已另装于用户 profile |
 | 省略 | 校园网认证、语音与其他个人 AI 工具、特殊内核、特定指纹驱动、额外字体集合、个人开发工作流 |
 
 启用 Atuin 的本地历史和 Ctrl+R，不启用自动同步，不复用任何历史或账号。
-功能开关只在 `hosts/aurora/features.nix` 中选择；省略的功能没有模块和专属 flake 输入。
+`hosts/aurora/features.nix` 管理其列出的功能开关；Docker、课堂视频与引导器另在主机模块配置。
+表格描述声明式基础桌面，不代表用户 profile 没有额外安装软件。
 FlClash 不向局域网开放额外防火墙端口。
 
 ## 配置与文件归属
@@ -29,13 +48,14 @@ FlClash 不向局域网开放额外防火墙端口。
 | --- | --- |
 | `~/.config/niri/config.kdl`、Fish/Kitty 基础配置、Rime 默认方案 | Home Manager 符号链接至只读 Nix store；改仓库后重建 |
 | `~/.config/niri/dms/*.kdl`、DMS settings/session | 首次创建，之后由 DMS 管理；重建保留界面修改 |
-| `~/.config/nvim/init.lua` | 首次复制 `assets/init.lua`，之后可直接编辑；不覆盖现有文件 |
+| `~/.config/nvim/` | 模块仅在 init.lua 不存在时复制模板；当前已改为本地 LazyVim，整个目录及插件锁需另行保存 |
 | `~/.local/share/com.follow.clash/` | FlClash 的本机设置和订阅，可写；首次创建 shared_preferences.json |
 | Rime 用户数据库、Atuin 历史 | 用户本机数据，不进入仓库 |
 
 没有硬链接，也没有依赖固定 checkout 路径的 `mkOutOfStoreSymlink`。
 固定配置与可写状态分别管理，首次桌面启动不需要克隆配置仓库。
-修改 Neovim 初始模板只影响还没有 init.lua 的用户；现有文件由朋友自己管理。
+修改 Neovim 初始模板只影响还没有 init.lua 的用户；不会覆盖当前 LazyVim。
+当前的 Lua 配置、lazy-lock.json、插件/解析器与必要编译产物需另行纳入配置管理或加密备份。
 
 FlClash 固定为上游 v0.8.99 发布包并校验 SHA-256，修复 NixOS 动态链接。
 Linux NativeAssetsManifest 未引用的 Android JNI 库被去除，避免引入无用的 JVM。
@@ -49,10 +69,11 @@ TUN 权限已准备；导入订阅后在界面选择规则模式、启用 TUN �
 ## Graphical boot 与 computer-use
 
 `modules/graphical-boot/default.nix` 沿用蓝本的启动模块：居中的 NixOS 标志、DMS 紫色配色、
-Plymouth 动画、1 秒启动菜单等待，以及启动画面到 Dank Greeter 的衔接。
-按 Esc 可查看启动日志或打开启动菜单。默认 `my.graphicalBoot.scale = 1`；
+Plymouth 动画，以及启动画面到 Dank Greeter 的衔接。
+当前主机将引导菜单覆盖为 GRUB、5 秒等待；Plymouth 期间按 Esc 可查看启动日志。默认 `my.graphicalBoot.scale = 1`；
 目标机确定后可调整缩放，并在目标硬件配置之外的主机模块添加早期 KMS 驱动。
 当前目标已确认使用 Intel UHD 730，`hosts/aurora/platform.nix` 配置早期 i915；缩放保留 1。
+另有 `i915.enable_psr=0`，`hosts/aurora/display.nix` 从 initrd 加载去掉 50 Hz 降频模式的面板 EDID；换显示硬件时重新审查。
 
 computer-use 启用上游 `programs.codexComputerUse` 模块的 Niri 窗口坐标与 agent 输入补丁、
 ydotool、`/dev/uinput` 权限和 AT-SPI。仅将 aurora 加入 ydotool 组。
@@ -103,7 +124,7 @@ root 只允许公钥登录，SSH 密码登录关闭。未复制维护者私钥�
 
 | 分区 | 安装用途 | 稳定标识 |
 | --- | --- | --- |
-| p9，488 MiB | FAT32 `/boot`，systemd-boot | PARTUUID `82583d67-296c-4c37-a6b6-976a4cbbe812` |
+| p9，488 MiB | FAT32 `/boot`，当前为 UEFI GRUB | PARTUUID `82583d67-296c-4c37-a6b6-976a4cbbe812` |
 | p10，99.5 GiB | Btrfs root/home/nix | PARTUUID `f63cafe7-af68-48d7-a02e-c021f166bbf0` |
 
 `diskLayout = "existing-partitions"`：disko 仅声明这两个分区，均 `destroy = false`，没有 GPT 重建操作。
@@ -114,13 +135,13 @@ ESP 显式使用 `mkfs.vfat -F 32`；488 MiB 分区使用默认参数会生成 F
 Windows 在另一块 ESP，可通过固件启动菜单选择原 Windows Boot Manager；不向 NixOS ESP 复制 Windows 文件。
 `modules/disk-whole.nix` 保留原整盘方案供 VM 使用，真实目标明确不采用它。
 
-当前启动器是 systemd-boot，旧 Arch 的 GRUB 不再使用。按住空格键显示启动菜单，
-可选 `Reboot Into Firmware Interface` 进入固件设置，再一次性选择 p1 的 Windows Boot Manager。
-也可在 NixOS 中执行 `sudo systemctl reboot --firmware-setup`。
-当前固件中 p1 的 Windows 入口为 Boot0004，p7 的 Boot0005 是噢易入口；编号可能随固件重建变化，
-应按分区路径辨认。NixOS 菜单尚未添加 Windows 的直接选项。
-跨 ESP 的直接菜单可通过 `boot.loader.systemd-boot.windows` 配置，但其 `efiDeviceHandle` 必须在
-UEFI Shell 中实际确认，不能把 Linux 分区名或未核验的 FS 编号填进去。
+当前启动器为 UEFI GRUB；`hosts/aurora/default.nix` 强制关闭公共磁盘模块里的 systemd-boot，
+设置 5 秒菜单与 3 个引导代际。Windows 菜单项按文件系统 UUID `B6E9-B042` 查找 ESP，
+链式启动 `/EFI/Microsoft/Boot/OSSBoot.efi`。这里记录的是源码配置，
+2026-10-16 未重新验证固件启动项、ESP 文件或 Windows 实际启动。
+不要按首次安装的 systemd-boot 菜单说明操作，也不要未经核验替换链式启动文件。
+可使用 `sudo systemctl reboot --firmware-setup` 进入支持此功能的固件设置。
+固件 Boot 编号可能随重建变化，应按实际分区和路径辨认。
 进入 Windows 前先处理噢易的分区还原策略；直接选择 p1 也不能保证 Windows 内的还原驱动不重置布局。
 
 换目标机器时必须重新检查硬件和分区，不能复用本机的路径和批准脚本：
@@ -146,9 +167,12 @@ ssh root@<IP> 'nixos-generate-config --no-filesystems --show-hardware-config' \
 
 ## 构建与预览
 
+当前 installation 检查因上述 GRUB EFI 断言失败。以下是构建/测试入口，
+不能据此推断它们在现配置下全部通过；先修复专用测试的 EFI 设置，再重新运行检查和 VM 演练。
+
 ```bash
 cd ~/src/aurora-nixos
-jj status
+git status --short
 nix fmt
 
 # 硬件未填写时也可检查完整桌面和虚拟磁盘脚本；不激活本机系统
@@ -166,7 +190,7 @@ nix run github:nix-community/nixos-anywhere/b6be7b277b468d55082584441cbef1fed853
 当前真实硬件和磁盘配置已完成，可检查求值并构建真实主机；换机器时先把 installationReady 设为 false：
 
 ```bash
-jj status
+git status --short
 nix flake check --no-build
 nix build .#nixosConfigurations.aurora.config.system.build.toplevel --out-link result-aurora
 nix build .#nixosConfigurations.aurora.config.system.build.diskoScript --out-link result-aurora-disko
@@ -175,7 +199,10 @@ nix build .#nixosConfigurations.aurora.config.system.build.diskoScript --out-lin
 `flake.lock` 沿用蓝本已锁定的 nixpkgs、Home Manager、DMS 和 disko 版本，另加入已选择的 computer-use 输入。
 不因准备朋友版而更新原仓库依赖。`stateVersion = "26.05"` 是此次初始数据兼容版本，后续升级保留。
 
-## 真正安装
+## 首次覆盖安装的历史流程
+
+本节保存 2026-10-09 的 Arch 覆盖安装过程，不是当前恢复系统的已验证操作手册。
+现系统已切换为 GRUB，安装测试存在待修复问题；恢复以 RESTORE.md 的准备项与重新演练结果为准。
 
 仅在目标磁盘、布局、硬件和实际构建全部检查完成后执行。
 本次仅格式化已批准的 p9、p10，不运行整盘擦除。以下是首次覆盖 Arch 的流程，不能用于日常重建。
@@ -265,7 +292,11 @@ nixos-rebuild boot --flake .#aurora --target-host root@<IP>
 SSH 公钥访问与 TUN helper 的权限代表已经选定的远程维护和本机代理能力。
 不自动清理旧系统代际，保留回滚入口。
 
-## 本次验证与压缩包
+## 历史验证与压缩包
+
+以下是 2026-10-08/09 的部署记录，仅对应当时配置与产物。
+2026-10-16 的源码匹配结果、当前安装检查失败和恢复缺口见本文顶部；
+旧压缩包与历史测试不能证明当前系统可完整离线恢复。
 
 2026-10-08 已通过完整桌面、disko 脚本和 FlClash 包构建，以及 Niri 配置校验。
 固定版本 nixos-anywhere 的 `aurora-preview --vm-test` 已通过：UEFI/Btrfs 分区、安装、重启、
