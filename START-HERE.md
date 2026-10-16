@@ -10,8 +10,8 @@
 - Windows 菜单按文件系统 UUID `B6E9-B042` 查找，启动 `/EFI/Microsoft/Boot/OSSBoot.efi`。
   这是当前配置值，本次没有重新验证实际 EFI 文件、启动项或噢易还原策略。
 - 桌面：补丁版 Niri、DMS、Dank Greeter、Fcitx5/Rime、PipeWire、FlClash 和 computer-use。
-- Docker/docker-compose 在 `hosts/aurora/default.nix` 启用，aurora 属于 docker 组。
-- 课堂视频模块来自受 Git 跟踪的 `oseasy-video-nixos/`，配置接口 `eno2`、远端 `10.115.3.82:17778`。
+- Docker/docker-compose 在 `modules/nixos/docker.nix` 启用，aurora 属于 docker 组。
+- 课堂视频参数在 `hosts/aurora/classroom.nix`，实现来自受 Git 跟踪的 `oseasy-video-nixos/`；配置接口 `eno2`、远端 `10.115.3.82:17778`。
   远端服务与校园网络不由本仓库重建。
 - 显示配置包括 `i915.enable_psr=0` 和自定义面板 EDID；换机时重新审查。
 
@@ -54,12 +54,14 @@ git commit -m "调整桌面快捷键"
 
 - `flake.nix` / `flake.lock`：入口和依赖锁，一起提交。
 - `hosts/aurora/`：硬件、磁盘、引导与显示配置。
-- `modules/`：系统与 Home Manager 配置。
+- `modules/nixos/`：可复用系统模块。
+- `home/aurora/`：Home Manager 用户配置。
 - `assets/`：固定配置与首次初始化模板。
 - `oseasy-video-nixos/`：本地模块和运行源码，必须随仓库保存。
 - `inventory/`：2026-10-15 采集的额外用户软件清单，不含应用数据。
 - `RESTORE.md`：当前恢复边界、准备项和恢复顺序。
-- `README.md`：模块说明、当前配置与带日期的历史部署记录。
+- `README.md`：当前目录、模块职责、维护和复现方法。
+- `docs/deployment-history.md`：保留原部署细节和带日期的历史记录。
 
 ## 软件与可写设置
 
