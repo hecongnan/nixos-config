@@ -13,7 +13,7 @@ Aurora 的个人 NixOS 配置：使用 Flake 锁定依赖，以 NixOS 模块管�
 - `system.stateVersion` 与 `home.stateVersion` 均保留 `26.05`；它们是数据兼容版本，不随软件更新递增。
 - 2026-10-16 本次目录迁移的各阶段均通过 `nixos-rebuild build`，最终系统产物与迁移前一致；未执行 switch。
 - `checks.x86_64-linux.installation` 原有 GRUB EFI 断言冲突尚未修复，不能宣称全部 flake 检查或恢复演练通过。
-- 用户 profile 的 22 项软件已按原软件输出和优先级纳入 Home Manager；旧 profile 暂保留，尚未激活此次变更。当前 LazyVim 配置和可写应用数据仍需单独备份。
+- 用户 profile 的 22 项软件已按原软件输出和优先级纳入 Home Manager，并已激活；旧 profile 的重复条目已移除，旧代际保留。当前 LazyVim 配置和可写应用数据仍需单独备份。
 - 软件声明化已通过离线系统构建；新 HM 环境的 250 个原 profile 命令均解析到原可执行文件。
 
 日常操作见 [START-HERE.md](START-HERE.md)，恢复边界和备份清单见 [RESTORE.md](RESTORE.md)。
@@ -93,7 +93,7 @@ Aurora 的个人 NixOS 配置：使用 Flake 锁定依赖，以 NixOS 模块管�
 Git Flake 不会自动包含未跟踪的新文件。避免使用 `git add .` 将私人文件意外加入。
 原 profile 的 22 项已完成声明化，构建表达式使用当前锁定 Nixpkgs，保留原输出和优先级。
 Neovim 保留 profile 中优先级为 4 的原包装版本，优先于现有 HM 程序模块产生的版本；原初始化逻辑不变。
-本次没有移除旧 profile 条目；激活并验收命令来源后，再单独决定是否清理重复安装。
+后续经授权已完成 switch，并在核验实际用户环境后移除旧 profile 的 22 个重复条目；清理后再次核验 250 个命令来源一致，旧代际保留。
 
 ## 构建与应用
 
@@ -112,7 +112,7 @@ sudo nixos-rebuild switch --flake .#aurora --no-write-lock-file
 ```
 
 引导、内核、驱动或图形登录变更需另行审查；可选择 `nixos-rebuild boot` 后重启验收。
-本次整理没有执行 switch、boot、重启、分区脚本、nixos-anywhere 或 disko 格式化。
+目录整理阶段仅 build；后续软件声明化经授权已执行 switch。未执行 boot、重启、分区脚本、nixos-anywhere 或 disko 格式化。
 `aurora-preview` 只用于 VM，不得作为真实机器安装入口。
 
 ## 更新 Flake

@@ -70,8 +70,9 @@ git commit -m "调整桌面快捷键"
 21 项直接使用现有锁定的 Nixpkgs；`nvim-system-tools` 已从其 derivation 恢复为
 `pkgs/nvim-system-tools/default.nix`，求值产物与原安装完全相同。
 
-旧 profile 仍有原 22 项安装，本次不执行 switch 或 `nix profile remove`。
-激活新配置并检查命令来源、桌面入口及开发工具后，再单独处理重复安装。
+后续经授权已激活新配置，Home Manager 服务成功，系统与用户无失败服务。
+核验 250 个命令来源后，已移除旧 profile 的 22 个重复条目；清理后命令仍全部可用。
+旧 profile 第 12 代保留，未清理 Store。图形应用与真实使用体验仍需日常验收。
 `inventory/` 保留为迁移前的核对清单，不是另一份需要同步编辑的软件声明。
 后续添加软件直接编辑 `home/aurora/packages.nix`。
 

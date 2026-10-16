@@ -85,7 +85,7 @@ nix flake archive --no-write-lock-file --to "file://$DEST/cache" --json . \
    仅导入 store 不会自动安装引导器、恢复 profile 或完成用户状态恢复。
 6. 原 profile 的 22 项已纳入 Home Manager，并恢复了 `pkgs/nvim-system-tools/default.nix`。
    新机器随系统和 HM 构建安装这些软件；用原 inventory 核对，不必重复手动安装旧 profile。
-   当前机器尚未激活本次变更，旧 profile 保留；离线恢复仍需预先保存对应闭包。
+   当前机器已激活该配置并移除旧 profile 重复项，保留旧代际；离线恢复仍需预先保存对应闭包。
 7. 解密并恢复个人数据、LazyVim、DMS、FlClash 和服务数据。
    HM 管理的链接让它重新生成，避免直接覆盖产生冲突。
 8. 检查本地登录、网络、桌面、输入法、锁屏、应用与数据库。
@@ -107,7 +107,7 @@ GRUB 的 3 个菜单代际也不能替代软件闭包与数据异地留存。
 
 1. 修复 `checks.x86_64-linux.installation` 的 EFI 断言冲突，重新完成求值和实际测试。
 2. 保存源码异地副本、系统和用户 profile 闭包；建立加密数据备份和独立密钥保管。
-3. profile 的 22 项与 nvim-system-tools 定义已纳入配置；后续激活验收，并独立纳入真实 Neovim 配置、插件锁和数据。
+3. profile 的 22 项与 nvim-system-tools 定义已纳入配置并激活，命令来源已验收；继续独立纳入真实 Neovim 配置、插件锁和数据。
 4. 建立隔离真实磁盘/Windows/显示设置的恢复 VM，在断网干净环境恢复系统与测试数据。
 5. 在备用盘或真实硬件验收 GPU、屏幕、音视频、挂起、实际 EFI 和 Windows/噢易行为。
 
