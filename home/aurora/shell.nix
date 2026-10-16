@@ -32,6 +32,9 @@ in
   };
   programs.neovim = {
     enable = true;
+    # The wrapper subtracts 1 from this priority, giving the HM package 5.
+    # Keep the original profile Neovim (priority 4) as the selected nvim command.
+    package = lib.setPrio 6 pkgs.neovim-unwrapped;
     # HM's provider initialization must not own the user's writable init.lua.
     sideloadInitLua = true;
     withNodeJs = false;

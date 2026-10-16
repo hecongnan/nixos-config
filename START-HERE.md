@@ -65,18 +65,15 @@ git commit -m "调整桌面快捷键"
 
 ## 软件与可写设置
 
-2026-10-16 实时 profile 仍有 22 项额外软件，尚未统一迁入声明式配置。
-其中 21 项有 Nixpkgs 属性；以 `inventory/user-profile.json` 的属性、固定来源与 priority 为线索，
-不要直接使用会漂移的 `nixpkgs#软件名` 作为长期恢复说明。
-例如按原固定来源恢复 Chrome：
+2026-10-16 原 profile 的 22 项软件已添加到 `home/aurora/packages.nix`，
+由 `home/aurora/default.nix` 的 `home.packages` 读取。逐项核对的软件输出与优先级均与原 profile 相同。
+21 项直接使用现有锁定的 Nixpkgs；`nvim-system-tools` 已从其 derivation 恢复为
+`pkgs/nvim-system-tools/default.nix`，求值产物与原安装完全相同。
 
-```bash
-NIXPKGS_ALLOW_UNFREE=1 nix profile install --impure --priority 5 \
-  github:NixOS/nixpkgs/151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4#google-chrome
-```
-
-`nvim-system-tools` 是无来源属性的本地构建结果；清单里的 store 路径不是下载地址。
-需找回构建表达式，或先保存其运行闭包。迁移软件时审查现有 Neovim/Vim 重复项、PATH 和应用优先级。
+旧 profile 仍有原 22 项安装，本次不执行 switch 或 `nix profile remove`。
+激活新配置并检查命令来源、桌面入口及开发工具后，再单独处理重复安装。
+`inventory/` 保留为迁移前的核对清单，不是另一份需要同步编辑的软件声明。
+后续添加软件直接编辑 `home/aurora/packages.nix`。
 
 当前 `~/.config/nvim` 已是可写的 LazyVim 环境，不是仓库 `assets/init.lua` 的简单模板。
 应保存整个配置、`lazy-lock.json`、必要的插件/解析器及编译结果；锁文件不能替代离线插件归档。
