@@ -5,12 +5,7 @@
     username = osConfig.my.machine.username;
     homeDirectory = "/home/${osConfig.my.machine.username}";
     stateVersion = "26.05";
-    packages = with pkgs; [
-      microsoft-edge nautilus file-roller loupe papers gnome-text-editor
-      zip unzip p7zip
-    ] ++ lib.optionals osConfig.my.features.terminalTools.enable [
-      yazi fzf ripgrep fd bat eza
-    ];
+    packages = import ./packages.nix { inherit lib pkgs osConfig; };
   };
   xdg.enable = true;
   xdg.userDirs = { enable = true; createDirectories = true; };
