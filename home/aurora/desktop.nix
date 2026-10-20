@@ -1,6 +1,25 @@
 { config, lib, pkgs, inputs, osConfig, ... }:
 let
   json = pkgs.formats.json { };
+  trayFocus = pkgs.writeShellApplication {
+    name = "dms-focus-tray-window";
+    runtimeInputs = [ pkgs.python3 pkgs.niri pkgs.systemd ];
+    text = ''
+      exec python3 ${inputs.dms-tray-focus}/focus-tray-window.py "$@"
+    '';
+  };
+  trayFocusShell = pkgs.runCommand "dms-shell-tray-focus" {
+    nativeBuildInputs = [ pkgs.patch ];
+  } ''
+    mkdir -p "$out"
+    # Reuse the exact packaged UI and its bundled DankCommon submodule.
+    cp -aL ${pkgs.dms-shell.src}/quickshell/. "$out/"
+    chmod -R u+w "$out"
+    test "$(tr -d '\n' < "$out/VERSION")" = "v1.6.2"
+    cd "$out"
+    patch --batch --fuzz=0 -p1 < ${inputs.dms-tray-focus}/tray-focus.patch
+  '';
+
   settings = json.generate "aurora-dms-settings.json" {
     configVersion = 18;
     clockFormat = "24h";
@@ -81,7 +100,13 @@ in
     Unit = { After = [ "niri.service" ]; Requisite = [ "niri.service" ]; };
     Service = {
       ExecStartPre = lib.getExe initialize;
-      Environment = [ "QT_QPA_PLATFORM=wayland" "QT_QPA_PLATFORMTHEME=qt5ct" "QT_QPA_PLATFORMTHEME_QT6=qt6ct" ];
+      Environment = [
+        "QT_QPA_PLATFORM=wayland"
+        "QT_QPA_PLATFORMTHEME=qt5ct"
+        "QT_QPA_PLATFORMTHEME_QT6=qt6ct"
+        "DMS_SHELL_DIR=${trayFocusShell}"
+        "DMS_TRAY_FOCUS_HELPER=${lib.getExe trayFocus}"
+      ];
     };
   };
   # Native niri integration launches Xwayland satellite on demand.

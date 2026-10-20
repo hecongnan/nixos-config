@@ -15,6 +15,11 @@
       url = "github:AvengeMedia/DankMaterialShell/v1.6.2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Standalone patch, pinned independently from the desktop configuration.
+    dms-tray-focus = {
+      url = "github:hecongnan/dms-niri-tray-focus/28bc757b2a2885b5cf99a1bcccd25caa6c1f8636";
+      flake = false;
+    };
     computer-use.url = "github:lihaoze123/niri-computer-use";
     # Keep the desktop version used in the blueprint and the cached backend pins.
     codex-desktop = {

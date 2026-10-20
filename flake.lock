@@ -125,6 +125,23 @@
         "type": "github"
       }
     },
+    "dms-tray-focus": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792461066,
+        "narHash": "sha256-YNTSWREHyy5K/KiccwpVW41ydm1QJ4IsrBdw38iMyHs=",
+        "owner": "hecongnan",
+        "repo": "dms-niri-tray-focus",
+        "rev": "28bc757b2a2885b5cf99a1bcccd25caa6c1f8636",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hecongnan",
+        "repo": "dms-niri-tray-focus",
+        "rev": "28bc757b2a2885b5cf99a1bcccd25caa6c1f8636",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -227,6 +244,7 @@
         "computer-use": "computer-use",
         "disko": "disko",
         "dms": "dms",
+        "dms-tray-focus": "dms-tray-focus",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs_3"
       }

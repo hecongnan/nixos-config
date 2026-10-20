@@ -21,6 +21,9 @@ Aurora 的个人 NixOS 配置：使用 Flake 锁定依赖，以 NixOS 模块管�
 [迁移记录](docs/migration-2026-10-16.md)说明本次变动；
 [历史部署说明](docs/deployment-history.md)保留原有功能细节、快捷键及安装历史。
 
+DMS 托盘点击聚焦通过固定版本的独立补丁仓库自动部署，恢复系统时无需手动安装。
+部署与已有本地覆盖的迁移见 [托盘聚焦说明](docs/niri-tray-focus.md)。
+
 ## 目录结构
 
 ```text
