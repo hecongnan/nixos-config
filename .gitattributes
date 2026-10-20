@@ -1,2 +1,0 @@
-# Unified patch context lines contain a required leading space.
-assets/dms/*.patch whitespace=-blank-at-eol
