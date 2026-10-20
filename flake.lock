@@ -238,6 +238,23 @@
         "url": "https://channels.nixos.org/nixos-unstable/nixexprs.tar.zst"
       }
     },
+    "nvim-config": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792463312,
+        "narHash": "sha256-vBsFTyBIG47JPNf/I2gIe/tF9bEKQZcuzmdJmc460RI=",
+        "owner": "hecongnan",
+        "repo": "nvim-config",
+        "rev": "e62ab4660fa4a893971ec4c8811f804c9d557ce7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hecongnan",
+        "repo": "nvim-config",
+        "rev": "e62ab4660fa4a893971ec4c8811f804c9d557ce7",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "codex-desktop": "codex-desktop",
@@ -246,7 +263,8 @@
         "dms": "dms",
         "dms-tray-focus": "dms-tray-focus",
         "home-manager": "home-manager",
-        "nixpkgs": "nixpkgs_3"
+        "nixpkgs": "nixpkgs_3",
+        "nvim-config": "nvim-config"
       }
     },
     "systems": {

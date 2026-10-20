@@ -20,6 +20,10 @@
       url = "github:hecongnan/dms-niri-tray-focus/28bc757b2a2885b5cf99a1bcccd25caa6c1f8636";
       flake = false;
     };
+    nvim-config = {
+      url = "github:hecongnan/nvim-config/e62ab4660fa4a893971ec4c8811f804c9d557ce7";
+      flake = false;
+    };
     computer-use.url = "github:lihaoze123/niri-computer-use";
     # Keep the desktop version used in the blueprint and the cached backend pins.
     codex-desktop = {
@@ -60,6 +64,14 @@
       nixosConfigurations.aurora-preview = preview;
       packages.${system}.flclash = pkgs.callPackage ./pkgs/flclash { };
       checks.${system} = {
+        codex-cli-layout = import ./tests/codex-cli-layout.nix { inherit pkgs; };
+        desktop-state = pkgs.runCommand "desktop-state-check" {
+          nativeBuildInputs = [ pkgs.python3 ];
+        } ''
+          python3 ${./tests/desktop-state.py} ${./assets/scripts/seed-desktop-state.py} ${./assets/desktop-state}
+          touch "$out"
+        '';
+
         flclash-loader = import ./tests/flclash-loader.nix {
           inherit pkgs;
           flclash = self.packages.${system}.flclash;

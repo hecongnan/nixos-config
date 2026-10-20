@@ -1,0 +1,2 @@
+# Preserve upstream plugin formatting verbatim.
+vendor/quickCapture/** -whitespace

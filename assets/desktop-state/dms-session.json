@@ -1,0 +1,8 @@
+{
+  "configVersion": 4,
+  "terminalOverride": "kitty",
+  "hiddenTrayIds": [
+    "FlClash"
+  ],
+  "isLightMode": false
+}

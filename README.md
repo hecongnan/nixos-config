@@ -24,6 +24,9 @@ Aurora 的个人 NixOS 配置：使用 Flake 锁定依赖，以 NixOS 模块管�
 DMS 托盘点击聚焦通过固定版本的独立补丁仓库自动部署，恢复系统时无需手动安装。
 部署与已有本地覆盖的迁移见 [托盘聚焦说明](docs/niri-tray-focus.md)。
 
+当前 DMS/niri 设置、quickCapture、VS Code 启动修复、Neovim 固定配置、
+Codex CLI 及外观/输入法设置已纳入恢复配置，见 [桌面恢复清单](docs/desktop-restoration-2026-10-20.md)。
+
 ## 目录结构
 
 ```text

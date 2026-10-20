@@ -1,6 +1,5 @@
 { config, lib, pkgs, inputs, osConfig, ... }:
 let
-  json = pkgs.formats.json { };
   trayFocus = pkgs.writeShellApplication {
     name = "dms-focus-tray-window";
     runtimeInputs = [ pkgs.python3 pkgs.niri pkgs.systemd ];
@@ -20,41 +19,15 @@ let
     patch --batch --fuzz=0 -p1 < ${inputs.dms-tray-focus}/tray-focus.patch
   '';
 
-  settings = json.generate "aurora-dms-settings.json" {
-    configVersion = 18;
-    clockFormat = "24h";
-    currentThemeName = "purple";
-    cursorSettings = { theme = "Bibata-Modern-Ice"; size = 24; };
-    launchPrefix = "systemd-run --user --collect --no-block --";
-    runDmsMatugenTemplates = false;
-    runUserMatugenTemplates = false;
-    syncModeWithPortal = false;
-  };
-  session = json.generate "aurora-dms-session.json" {
-    configVersion = 4;
-    isLightMode = false;
-    wallpaperPath = "${config.home.homeDirectory}/.background/wallpaper.svg";
-    terminalOverride = "kitty";
-  };
   initialize = pkgs.writeShellApplication {
     name = "initialize-aurora-dms";
-    runtimeInputs = [ pkgs.coreutils ];
+    runtimeInputs = [ pkgs.coreutils pkgs.python3 ];
     text = ''
-      settings_dir=${lib.escapeShellArg "${config.xdg.configHome}/DankMaterialShell"}
-      state_dir=${lib.escapeShellArg "${config.xdg.stateHome}/DankMaterialShell"}
-      fragments_dir=${lib.escapeShellArg "${config.xdg.configHome}/niri/dms"}
-      install -d -m 700 "$settings_dir" "$state_dir" "$fragments_dir"
-      if [ ! -e "$settings_dir/settings.json" ]; then
-        install -m 600 ${settings} "$settings_dir/settings.json"
-      fi
-      if [ ! -e "$state_dir/session.json" ]; then
-        install -m 600 ${session} "$state_dir/session.json"
-      fi
-      for name in colors layout alttab binds cursor outputs windowrules wpblur input; do
-        if [ ! -e "$fragments_dir/$name.kdl" ]; then
-          install -m 600 /dev/null "$fragments_dir/$name.kdl"
-        fi
-      done
+      python3 ${../../assets/scripts/seed-desktop-state.py} \
+        --snapshot ${../../assets/desktop-state} \
+        --config-home ${lib.escapeShellArg config.xdg.configHome} \
+        --state-home ${lib.escapeShellArg config.xdg.stateHome} \
+        --wallpaper ${lib.escapeShellArg "${config.home.homeDirectory}/.background/wallpaper.svg"}
       install -d -m 700 ${lib.escapeShellArg "${config.home.homeDirectory}/Pictures/Screenshots"}
     '';
   };
@@ -86,6 +59,8 @@ in
     iconTheme = { name = "Adwaita"; package = pkgs.adwaita-icon-theme; };
   };
   qt = { enable = true; platformTheme.name = "qtct"; };
+  xdg.configFile."qt6ct/qt6ct.conf".text = "[Appearance]\nicon_theme=Papirus-Dark\n";
+  xdg.configFile."DankMaterialShell/plugins/quickCapture".source = ../../vendor/quickCapture;
   home.packages = with pkgs; [ papirus-icon-theme adw-gtk3 satty grim slurp xwayland-satellite ];
   home.sessionVariables.QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
   systemd.user.sessionVariables.QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
@@ -102,8 +77,9 @@ in
       ExecStartPre = lib.getExe initialize;
       Environment = [
         "QT_QPA_PLATFORM=wayland"
-        "QT_QPA_PLATFORMTHEME=qt5ct"
+        "QT_QPA_PLATFORMTHEME=qt6ct"
         "QT_QPA_PLATFORMTHEME_QT6=qt6ct"
+        "QS_ICON_THEME=Papirus-Dark"
         "DMS_SHELL_DIR=${trayFocusShell}"
         "DMS_TRAY_FOCUS_HELPER=${lib.getExe trayFocus}"
       ];

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, osConfig, ... }:
+{ config, lib, pkgs, inputs, osConfig, ... }:
 let
   initializeNvim = pkgs.writeShellApplication {
     name = "initialize-aurora-nvim";
@@ -7,12 +7,22 @@ let
       directory=${lib.escapeShellArg "${config.xdg.configHome}/nvim"}
       install -d -m 700 "$directory"
       if [ ! -e "$directory/init.lua" ]; then
-        install -m 600 ${../../assets/init.lua} "$directory/init.lua"
+        cp -a ${inputs.nvim-config}/. "$directory/"
+        chmod -R u+rwX "$directory"
       fi
     '';
   };
 in
 {
+  home.sessionPath = [ "${config.home.homeDirectory}/.local/bin" ];
+  home.sessionVariables.NVIM_SYSTEM_TOOLS = "${import ../../pkgs/nvim-system-tools { inherit pkgs; }}";
+  home.file.".profile".text = ''
+    # Home Manager session variables plus standalone user commands.
+    if [ -r "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh" ]; then
+      . "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
+    fi
+    export PATH="$HOME/.local/bin:$PATH"
+  '';
   programs.fish = { enable = true; interactiveShellInit = "set -g fish_greeting"; };
   programs.starship = {
     enable = true;
@@ -41,7 +51,7 @@ in
     withPython3 = false;
     withRuby = false;
   };
-  # Writable local init.lua, created once. No repository checkout or plugins needed.
+  # Seed the pinned complete config once; Lazy can still update writable lock files.
   home.activation.initializeNvim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     run ${lib.getExe initializeNvim}
   '';

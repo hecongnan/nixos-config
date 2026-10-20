@@ -1,6 +1,6 @@
 { config, lib, pkgs, osConfig, ... }:
 {
-  imports = [ ./desktop.nix ./input.nix ./shell.nix ./flclash.nix ];
+  imports = [ ./desktop.nix ./input.nix ./shell.nix ./flclash.nix ./editor-launchers.nix ];
   home = {
     username = osConfig.my.machine.username;
     homeDirectory = "/home/${osConfig.my.machine.username}";
