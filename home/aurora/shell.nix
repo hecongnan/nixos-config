@@ -47,8 +47,194 @@ in
   programs.eza = {
     enable = true;
     enableFishIntegration = true;
-    icons = "auto";
+    icons = "always";
+    colors = "always";
     extraOptions = [ "--group-directories-first" ];
+    theme = {
+      "filekinds" = {
+        "normal" = {
+          "foreground" = "#f8f8f2";
+          "is_bold" = false;
+        };
+        "directory" = {
+          "foreground" = "#bd93f9";
+          "is_bold" = true;
+        };
+        "symlink" = {
+          "foreground" = "#8be9fd";
+          "is_bold" = false;
+        };
+        "executable" = {
+          "foreground" = "#50fa7b";
+          "is_bold" = false;
+        };
+      };
+      "file_type" = {
+        "video" = {
+          "foreground" = "#ff79c6";
+        };
+        "image" = {
+          "foreground" = "#50fa7b";
+        };
+        "music" = {
+          "foreground" = "#8be9fd";
+        };
+        "compressed" = {
+          "foreground" = "#ff5555";
+        };
+        "document" = {
+          "foreground" = "#f8f8f2";
+        };
+        "source" = {
+          "foreground" = "#f1fa8c";
+        };
+        "build" = {
+          "foreground" = "#8be9fd";
+        };
+      };
+      "extensions" = {
+        "mp4" = {
+          "filename" = {
+            "foreground" = "#ff79c6";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#ff79c6";
+            };
+            "glyph" = "";
+          };
+        };
+        "mkv" = {
+          "filename" = {
+            "foreground" = "#ff79c6";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#ff79c6";
+            };
+            "glyph" = "";
+          };
+        };
+        "avi" = {
+          "filename" = {
+            "foreground" = "#ff79c6";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#ff79c6";
+            };
+            "glyph" = "";
+          };
+        };
+        "mov" = {
+          "filename" = {
+            "foreground" = "#ff79c6";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#ff79c6";
+            };
+            "glyph" = "";
+          };
+        };
+        "webm" = {
+          "filename" = {
+            "foreground" = "#ff79c6";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#ff79c6";
+            };
+            "glyph" = "";
+          };
+        };
+        "m4v" = {
+          "filename" = {
+            "foreground" = "#ff79c6";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#ff79c6";
+            };
+            "glyph" = "";
+          };
+        };
+        "nix" = {
+          "filename" = {
+            "foreground" = "#f1fa8c";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#f1fa8c";
+            };
+            "glyph" = "";
+          };
+        };
+        "toml" = {
+          "filename" = {
+            "foreground" = "#8be9fd";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#8be9fd";
+            };
+          };
+        };
+        "yaml" = {
+          "filename" = {
+            "foreground" = "#8be9fd";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#8be9fd";
+            };
+          };
+        };
+        "yml" = {
+          "filename" = {
+            "foreground" = "#8be9fd";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#8be9fd";
+            };
+          };
+        };
+        "ini" = {
+          "filename" = {
+            "foreground" = "#8be9fd";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#8be9fd";
+            };
+          };
+        };
+        "conf" = {
+          "filename" = {
+            "foreground" = "#8be9fd";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#8be9fd";
+            };
+          };
+        };
+      };
+      "filenames" = {
+        "flake.lock" = {
+          "filename" = {
+            "foreground" = "#f8f8f2";
+          };
+          "icon" = {
+            "style" = {
+              "foreground" = "#f8f8f2";
+            };
+            "glyph" = "";
+          };
+        };
+      };
+    };
   };
   programs.zoxide = { enable = true; enableFishIntegration = true; };
   programs.atuin = {
