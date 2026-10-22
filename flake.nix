@@ -65,6 +65,15 @@
       packages.${system}.flclash = pkgs.callPackage ./pkgs/flclash { };
       checks.${system} = {
         codex-cli-layout = import ./tests/codex-cli-layout.nix { inherit pkgs; };
+        scratchpad = pkgs.runCommand "scratchpad-check" {
+          nativeBuildInputs = [ pkgs.python3 ];
+        } ''
+          mkdir -p assets/scripts tests
+          cp ${./assets/scripts/scratchpad.py} assets/scripts/scratchpad.py
+          cp ${./tests/test-scratchpad.py} tests/test-scratchpad.py
+          python3 tests/test-scratchpad.py
+          touch "$out"
+        '';
         desktop-state = pkgs.runCommand "desktop-state-check" {
           nativeBuildInputs = [ pkgs.python3 ];
         } ''

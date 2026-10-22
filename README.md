@@ -27,6 +27,8 @@ DMS 托盘点击聚焦通过固定版本的独立补丁仓库自动部署，恢�
 当前 DMS/niri 设置、quickCapture、VS Code 启动修复、Neovim 固定配置、
 Codex CLI 及外观/输入法设置已纳入恢复配置，见 [桌面恢复清单](docs/desktop-restoration-2026-10-20.md)。
 
+Niri 支持任意窗口的收起、呼出和循环切换，快捷键与行为见 [窗口暂存区](docs/niri-scratchpad.md)。
+
 ## 目录结构
 
 ```text

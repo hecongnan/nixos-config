@@ -33,7 +33,7 @@ let
   };
 in
 {
-  imports = [ inputs.dms.homeModules.dank-material-shell ];
+  imports = [ inputs.dms.homeModules.dank-material-shell ./scratchpad.nix ];
   programs.dank-material-shell = {
     enable = true;
     package = pkgs.dms-shell;

@@ -74,6 +74,8 @@ binds {
     Mod+Shift+Q { quit; }
 }
 
+include "scratchpad.kdl"
+
 // Writable GUI overrides come last. No fixed display resolution or scale.
 include optional=true "computer-use.kdl"
 include optional=true "dms/colors.kdl"
