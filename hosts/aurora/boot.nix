@@ -1,5 +1,7 @@
 { lib, ... }:
 {
+  imports = [ ./boreal-grub ];
+
   boot.loader = {
     systemd-boot.enable = lib.mkForce false;
     efi.canTouchEfiVariables = true;

@@ -1,0 +1,66 @@
+title-text: ""
+
+desktop-image: "desktop.png"
+
+terminal-border: "0"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+
+
+
+
+
++ image {
+    left = 153
+    top = 205
+    file = "panel-front.png"
+}
+
++ image {
+    left = 967
+    top = 0
+    width = 953
+    height = 100%
+    file = "right.png"
+}
+
++ boot_menu {
+    left = 186
+    top = 337
+    width = 748
+    height = 398
+    item_color = gray
+    selected_item_color = gray
+    icon_width = 748
+    icon_height = 48
+    item_icon_space = 0
+    item_padding = 0
+    item_height = 48
+    item_spacing = 2
+    selected_item_pixmap_style = "item-selected-*.png"
+}
+
++ progress_bar {
+    id = "__timeout__"
+    left = 234
+    top = 889
+    width = 652
+    bar_style = "bar-default-*.png"
+    highlight_style = "bar-highlighted-*.png"
+}
+
++ image {
+    left = 153
+    top = 205
+    file = "panel-back.png"
+}
+
++ image {
+    left = 0
+    top = 0
+    width = 967
+    height = 100%
+    file = "left.png"
+}
