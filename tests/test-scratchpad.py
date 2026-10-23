@@ -27,8 +27,8 @@ class Desktop:
             {"id": 30, "idx": 1, "name": None, "output": "C", "is_focused": False},
         ]
         self.windows = {
-            1: {"id": 1, "workspace_id": 10, "app_id": "browser", "is_focused": False},
-            2: {"id": 2, "workspace_id": 10, "app_id": None, "is_focused": True},
+            1: {"id": 1, "workspace_id": 10, "app_id": "browser", "is_focused": False, "is_floating": False},
+            2: {"id": 2, "workspace_id": 10, "app_id": None, "is_focused": True, "is_floating": False},
         }
         self.actions = []
 
@@ -77,10 +77,45 @@ class ScratchpadTests(unittest.TestCase):
         self.assertEqual(self.desktop.windows[2]["workspace_id"], 20)
         self.assertTrue(self.desktop.windows[1]["is_focused"])
         self.run_command("toggle")
-        self.assertTrue(self.desktop.windows[2]["is_floating"])
+        self.assertFalse(self.desktop.windows[2]["is_floating"])
         self.assertTrue(self.desktop.windows[2]["is_focused"])
         self.run_command("toggle")
         self.assertEqual(self.desktop.windows[2]["workspace_id"], 20)
+        self.assertTrue(self.desktop.windows[1]["is_focused"])
+
+    def test_round_trip_preserves_both_modes_and_background_layout(self):
+        for floating in (False, True):
+            with self.subTest(floating=floating):
+                self.setUp()
+                self.desktop.windows[2]["is_floating"] = floating
+                self.desktop.windows[2]["layout"] = {
+                    "window_size": [640, 480], "tile_pos_in_workspace_view": [120.0, 90.0]
+                }
+                self.desktop.windows[1]["layout"] = {
+                    "window_size": [900, 1000], "pos_in_scrolling_layout": [1, 1]
+                }
+                self.run_command("stash")
+                background = copy.deepcopy(self.desktop.windows[1])
+                original_layout = copy.deepcopy(self.desktop.windows[2]["layout"])
+                self.run_command("toggle")
+                self.assertEqual(self.desktop.windows[2]["is_floating"], floating)
+                self.assertEqual(self.desktop.windows[2]["layout"], original_layout)
+                self.run_command("toggle")
+                self.assertEqual(self.desktop.windows[1], background)
+                self.assertEqual(self.desktop.windows[2]["is_floating"], floating)
+                self.assertFalse(any(name in {
+                    "MoveWindowToFloating", "MoveWindowToTiling", "CenterWindow",
+                    "SetWindowWidth", "SetWindowHeight", "MoveFloatingWindow"
+                } for name, _ in self.desktop.actions))
+
+    def test_refocus_visible_window_does_not_reinsert_or_reposition(self):
+        self.run_command("stash")
+        self.run_command("toggle")
+        self.desktop.focus(1)
+        self.desktop.actions.clear()
+        self.run_command("toggle")
+        self.assertEqual(self.desktop.actions, [("FocusWindow", {"id": 2})])
+        self.run_command("toggle")
         self.assertTrue(self.desktop.windows[1]["is_focused"])
 
     def test_cross_monitor_summon_uses_global_workspace_id(self):
