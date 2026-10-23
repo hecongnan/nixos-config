@@ -67,9 +67,30 @@ def manage(niri, state, command, workspace_name="scratch"):
                  if w["workspace_id"] == stash["id"] and wid not in order)
     state["order"] = order
     modes = state.setdefault("restore_modes", {})
-    for key in list(modes):
-        if key not in {str(wid) for wid in windows}:
-            del modes[key]
+    geometries = state.setdefault("restore_geometry", {})
+    for records in (modes, geometries):
+        for key in list(records):
+            if key not in {str(wid) for wid in windows}:
+                del records[key]
+
+    def geometry(window):
+        layout = window.get("layout", {})
+        position, size = layout.get("tile_pos_in_workspace_view"), layout.get("window_size")
+        if not window.get("is_floating") or not position or not size:
+            return None
+        return {"x": position[0], "y": position[1], "width": size[0], "height": size[1]}
+
+    def place(wid, bounds):
+        niri.action("SetWindowWidth", id=wid, change={"SetFixed": bounds["width"]})
+        niri.action("SetWindowHeight", id=wid, change={"SetFixed": bounds["height"]})
+        # IPC absolute coordinates are relative to the working area, whereas
+        # layout coordinates include panel offsets. Deltas share one origin.
+        window = next((w for w in niri.query("Windows") if w["id"] == wid), None)
+        current_bounds = geometry(window) if window else None
+        if current_bounds:
+            niri.action("MoveFloatingWindow", id=wid,
+                        x={"AdjustFixed": bounds["x"] - current_bounds["x"]},
+                        y={"AdjustFixed": bounds["y"] - current_bounds["y"]})
 
     def move(wid, workspace_id):
         # IDs are global across outputs; indices are local to each monitor.
@@ -78,13 +99,28 @@ def manage(niri, state, command, workspace_name="scratch"):
 
     def hide(window):
         nonlocal current
+        key = str(window["id"])
+        bounds = geometry(window)
+        if key in modes and bounds:
+            state["slot"] = {"output": current.get("output"), "bounds": bounds}
         move(window["id"], stash["id"])
+        # Restore geometry in the hidden floating layout, even if the user
+        # manually toggled the shown member back to tiling before hiding it.
+        is_floating = window.get("is_floating", False)
+        if key in geometries:
+            if not is_floating:
+                niri.action("MoveWindowToFloating", id=window["id"])
+                is_floating = True
+            place(window["id"], geometries[key])
+            del geometries[key]
+        if state.get("visible_window") == window["id"]:
+            state.pop("visible_window", None)
         # Restore the pre-summon mode only after leaving the visible workspace,
         # so restoring tiling cannot reflow its other windows.
         key = str(window["id"])
         if key in modes:
             original_floating = modes[key]
-            if original_floating != window.get("is_floating", False):
+            if original_floating != is_floating:
                 niri.action("MoveWindowToFloating" if original_floating else "MoveWindowToTiling",
                             id=window["id"])
             del modes[key]
@@ -125,18 +161,25 @@ def manage(niri, state, command, workspace_name="scratch"):
         if focused and focused["id"] in order:
             order.remove(focused["id"])
             modes.pop(str(focused["id"]), None)
+            geometries.pop(str(focused["id"]), None)
+            if state.get("visible_window") == focused["id"]:
+                state.pop("visible_window", None)
             state.pop("return_window", None)
         return
 
-    # Hide the focused scratchpad before toggling off or cycling. An unfocused
-    # scratchpad is brought into focus, rather than unexpectedly disappearing.
-    if focused and focused["id"] in order and not recovering:
-        order.remove(focused["id"])
-        order.append(focused["id"])
-        hide(focused)
+    # Cycling replaces the visible member even if keyboard focus was lost.
+    shown = focused if focused and focused["id"] in order else None
+    if command == "next" and shown is None:
+        shown = windows.get(state.get("visible_window"))
+        if not shown or shown["workspace_id"] != current["id"]:
+            shown = next((w for w in windows.values() if w["id"] in order
+                          and str(w["id"]) in modes and w["workspace_id"] == current["id"]), None)
+    if shown and not recovering:
+        order.remove(shown["id"])
+        order.append(shown["id"])
+        hide(shown)
         if command == "toggle":
             return
-        # The next window follows last-stashed-first order, then wraps around.
         order.insert(0, order.pop())
     elif command == "next":
         order.insert(0, order.pop())
@@ -151,9 +194,15 @@ def manage(niri, state, command, workspace_name="scratch"):
     modes.setdefault(str(target), target_window.get("is_floating", False))
     if not target_window.get("is_floating", False):
         niri.action("MoveWindowToFloating", id=target)
+        target_window = next((w for w in niri.query("Windows") if w["id"] == target), target_window)
+    if str(target) not in geometries:
+        bounds = geometry(target_window)
+        if bounds:
+            geometries[str(target)] = bounds
     # Refocusing a visible scratchpad must not reinsert its column or change
     # its floating position. Preserve the original return focus as well.
     if target_window["workspace_id"] == current["id"]:
+        state["visible_window"] = target
         niri.action("FocusWindow", id=target)
         return
     # The fresh query above also captures the actual return focus after cycling.
@@ -161,6 +210,10 @@ def manage(niri, state, command, workspace_name="scratch"):
     if previous and previous["id"] != target:
         state["return_window"] = previous["id"]
     move(target, current["id"])
+    slot = state.get("slot", {})
+    if slot.get("output") == current.get("output") and slot.get("bounds"):
+        place(target, slot["bounds"])
+    state["visible_window"] = target
     niri.action("FocusWindow", id=target)
 
 

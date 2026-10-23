@@ -60,6 +60,13 @@ class Desktop:
                 window["is_focused"] = False
         elif name == "FocusWindow":
             self.focus(arguments["id"])
+        elif name in ("SetWindowWidth", "SetWindowHeight"):
+            dimension = 0 if name == "SetWindowWidth" else 1
+            self.windows[arguments["id"]]["layout"]["window_size"][dimension] = arguments["change"]["SetFixed"]
+        elif name == "MoveFloatingWindow":
+            position = self.windows[arguments["id"]]["layout"]["tile_pos_in_workspace_view"]
+            position[0] += arguments["x"]["AdjustFixed"]
+            position[1] += arguments["y"]["AdjustFixed"]
         elif name in ("MoveWindowToFloating", "MoveWindowToTiling"):
             self.windows[arguments["id"]]["is_floating"] = name == "MoveWindowToFloating"
 
@@ -105,8 +112,49 @@ class ScratchpadTests(unittest.TestCase):
                 self.assertEqual(self.desktop.windows[2]["is_floating"], floating)
                 self.assertFalse(any(name in {
                     "CenterWindow",
-                    "SetWindowWidth", "SetWindowHeight", "MoveFloatingWindow"
                 } for name, _ in self.desktop.actions))
+
+    def test_cycle_reuses_slot_and_restores_each_windows_own_geometry(self):
+        self.desktop.windows[2]["is_floating"] = True
+        self.desktop.windows[2]["layout"] = {"window_size": [600, 400], "tile_pos_in_workspace_view": [80.0, 120.0]}
+        self.desktop.windows[1]["is_floating"] = True
+        self.desktop.windows[1]["layout"] = {"window_size": [900, 700], "tile_pos_in_workspace_view": [300.0, 200.0]}
+        original = {wid: copy.deepcopy(w["layout"]) for wid, w in self.desktop.windows.items()}
+        self.run_command("stash")
+        self.run_command("stash")
+        self.run_command("toggle")
+        self.run_command("next")
+        self.assertEqual(self.desktop.windows[2]["layout"], original[1])
+        self.assertEqual(self.desktop.windows[1]["workspace_id"], 20)
+        self.assertEqual(self.desktop.windows[1]["layout"], original[1])
+        # User moves and resizes the displayed slot; the next member follows.
+        changed = {"window_size": [720, 500], "tile_pos_in_workspace_view": [140.0, 60.0]}
+        self.desktop.windows[2]["layout"] = copy.deepcopy(changed)
+        self.run_command("next")
+        self.assertEqual(self.desktop.windows[1]["layout"], changed)
+        self.assertEqual(self.desktop.windows[2]["layout"], original[2])
+        self.run_command("toggle")
+        self.assertEqual(self.desktop.windows[1]["layout"], original[1])
+
+    def test_cycle_with_lost_focus_hides_previous_visible_member(self):
+        self.run_command("stash")
+        self.run_command("stash")
+        self.run_command("toggle")
+        self.desktop.windows[3] = {"id": 3, "workspace_id": 10, "is_focused": False}
+        self.desktop.focus(3)
+        self.run_command("next")
+        self.assertEqual(self.desktop.windows[1]["workspace_id"], 20)
+        self.assertEqual(self.desktop.windows[2]["workspace_id"], 10)
+        self.assertTrue(self.desktop.windows[2]["is_focused"])
+
+    def test_manual_tiling_before_hide_still_restores_original_mode(self):
+        self.desktop.windows[2]["layout"] = {"window_size": [600, 400], "tile_pos_in_workspace_view": [80.0, 120.0]}
+        self.run_command("stash")
+        self.run_command("toggle")
+        self.desktop.action("MoveWindowToTiling", id=2)
+        self.run_command("toggle")
+        self.assertEqual(self.desktop.windows[2]["workspace_id"], 20)
+        self.assertFalse(self.desktop.windows[2]["is_floating"])
 
     def test_temporary_floating_does_not_reflow_destination(self):
         self.run_command("stash")
