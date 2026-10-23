@@ -66,6 +66,11 @@ def manage(niri, state, command, workspace_name="scratch"):
     order.extend(wid for wid, w in windows.items()
                  if w["workspace_id"] == stash["id"] and wid not in order)
     state["order"] = order
+    # Reset legacy arbitrary slot bounds once; retain membership and backups.
+    if state.get("slot_policy") != "centered-default-v1":
+        state.pop("slot", None)
+        state["slot_policy"] = "centered-default-v1"
+        state["center_slot"] = True
     modes = state.setdefault("restore_modes", {})
     geometries = state.setdefault("restore_geometry", {})
     for records in (modes, geometries):
@@ -92,6 +97,15 @@ def manage(niri, state, command, workspace_name="scratch"):
                         x={"AdjustFixed": bounds["x"] - current_bounds["x"]},
                         y={"AdjustFixed": bounds["y"] - current_bounds["y"]})
 
+    def center_slot(wid):
+        # Original patch behavior: native floating size, centered by Niri.
+        niri.action("CenterWindow", id=wid)
+        window = next((w for w in niri.query("Windows") if w["id"] == wid), None)
+        bounds = geometry(window) if window else None
+        if bounds:
+            state["slot"] = {"output": current.get("output"), "bounds": bounds}
+        state.pop("center_slot", None)
+
     def move(wid, workspace_id):
         # IDs are global across outputs; indices are local to each monitor.
         niri.action("MoveWindowToWorkspace", window_id=wid,
@@ -101,7 +115,7 @@ def manage(niri, state, command, workspace_name="scratch"):
         nonlocal current
         key = str(window["id"])
         bounds = geometry(window)
-        if key in modes and bounds:
+        if key in modes and bounds and not state.get("center_slot"):
             state["slot"] = {"output": current.get("output"), "bounds": bounds}
         move(window["id"], stash["id"])
         # Restore geometry in the hidden floating layout, even if the user
@@ -202,6 +216,10 @@ def manage(niri, state, command, workspace_name="scratch"):
     # Refocusing a visible scratchpad must not reinsert its column or change
     # its floating position. Preserve the original return focus as well.
     if target_window["workspace_id"] == current["id"]:
+        if state.get("center_slot"):
+            if str(target) in geometries:
+                place(target, geometries[str(target)])
+            center_slot(target)
         state["visible_window"] = target
         niri.action("FocusWindow", id=target)
         return
@@ -213,6 +231,8 @@ def manage(niri, state, command, workspace_name="scratch"):
     slot = state.get("slot", {})
     if slot.get("output") == current.get("output") and slot.get("bounds"):
         place(target, slot["bounds"])
+    else:
+        center_slot(target)
     state["visible_window"] = target
     niri.action("FocusWindow", id=target)
 
