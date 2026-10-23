@@ -128,13 +128,16 @@ def manage(niri, state, command, workspace_name="scratch"):
         order.insert(0, order.pop())
 
     target = order[-1]
+    live = niri.query("Windows")
+    target_window = next((w for w in live if w["id"] == target), None)
+    if target_window is None:
+        return
     # Refocusing a visible scratchpad must not reinsert its column or change
     # its floating position. Preserve the original return focus as well.
-    if windows[target]["workspace_id"] == current["id"]:
+    if target_window["workspace_id"] == current["id"]:
         niri.action("FocusWindow", id=target)
         return
-    # Query again after hiding/cycling so we remember the actual return focus.
-    live = niri.query("Windows")
+    # The fresh query above also captures the actual return focus after cycling.
     previous = next((w for w in live if w["is_focused"]), None)
     if previous and previous["id"] != target:
         state["return_window"] = previous["id"]

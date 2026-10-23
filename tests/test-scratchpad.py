@@ -118,6 +118,14 @@ class ScratchpadTests(unittest.TestCase):
         self.run_command("toggle")
         self.assertTrue(self.desktop.windows[1]["is_focused"])
 
+    def test_cycling_single_window_uses_its_position_after_hiding(self):
+        self.run_command("stash")
+        self.run_command("toggle")
+        self.run_command("next")
+        self.assertEqual(self.desktop.windows[2]["workspace_id"], 10)
+        self.assertTrue(self.desktop.windows[2]["is_focused"])
+        self.assertFalse(self.desktop.windows[2]["is_floating"])
+
     def test_cross_monitor_summon_uses_global_workspace_id(self):
         self.run_command("stash")
         self.desktop.windows[3] = {"id": 3, "workspace_id": 30, "is_focused": False}
