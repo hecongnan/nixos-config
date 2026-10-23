@@ -9,6 +9,11 @@ import os
 from pathlib import Path
 import socket
 import sys
+import time
+
+
+# Size observed with the original patch on this desktop; not a maximized tile.
+DEFAULT_SLOT_SIZE = (954, 1028)
 
 
 class Niri:
@@ -67,9 +72,9 @@ def manage(niri, state, command, workspace_name="scratch"):
                  if w["workspace_id"] == stash["id"] and wid not in order)
     state["order"] = order
     # Reset legacy arbitrary slot bounds once; retain membership and backups.
-    if state.get("slot_policy") != "centered-default-v1":
+    if state.get("slot_policy") != "original-window-954x1028-v1":
         state.pop("slot", None)
-        state["slot_policy"] = "centered-default-v1"
+        state["slot_policy"] = "original-window-954x1028-v1"
         state["center_slot"] = True
     modes = state.setdefault("restore_modes", {})
     geometries = state.setdefault("restore_geometry", {})
@@ -98,7 +103,20 @@ def manage(niri, state, command, workspace_name="scratch"):
                         y={"AdjustFixed": bounds["y"] - current_bounds["y"]})
 
     def center_slot(wid):
-        # Original patch behavior: native floating size, centered by Niri.
+        # Use the original observed window size, not a maximized app's size.
+        width, height = DEFAULT_SLOT_SIZE
+        niri.action("SetWindowWidth", id=wid, change={"SetFixed": width})
+        niri.action("SetWindowHeight", id=wid, change={"SetFixed": height})
+        # Wayland clients acknowledge resize asynchronously. Do not save the
+        # old full-width geometry as the shared slot before they respond.
+        deadline = time.monotonic() + 0.5
+        while True:
+            window = next((w for w in niri.query("Windows") if w["id"] == wid), None)
+            if (window is None or not window.get("layout")
+                    or window.get("layout", {}).get("window_size") == [width, height]
+                    or time.monotonic() >= deadline):
+                break
+            time.sleep(0.02)
         niri.action("CenterWindow", id=wid)
         window = next((w for w in niri.query("Windows") if w["id"] == wid), None)
         bounds = geometry(window) if window else None

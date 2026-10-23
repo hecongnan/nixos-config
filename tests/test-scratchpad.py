@@ -67,7 +67,9 @@ class Desktop:
                 layout["tile_pos_in_workspace_view"] = [(1920-width)/2, (1080-height)/2]
         elif name in ("SetWindowWidth", "SetWindowHeight"):
             dimension = 0 if name == "SetWindowWidth" else 1
-            self.windows[arguments["id"]]["layout"]["window_size"][dimension] = arguments["change"]["SetFixed"]
+            layout = self.windows[arguments["id"]].get("layout")
+            if layout:
+                layout["window_size"][dimension] = arguments["change"]["SetFixed"]
         elif name == "MoveFloatingWindow":
             position = self.windows[arguments["id"]]["layout"]["tile_pos_in_workspace_view"]
             position[0] += arguments["x"]["AdjustFixed"]
@@ -111,7 +113,7 @@ class ScratchpadTests(unittest.TestCase):
                 original_layout = copy.deepcopy(self.desktop.windows[2]["layout"])
                 self.run_command("toggle")
                 self.assertTrue(self.desktop.windows[2]["is_floating"])
-                self.assertEqual(self.desktop.windows[2]["layout"]["window_size"], original_layout["window_size"])
+                self.assertEqual(self.desktop.windows[2]["layout"]["window_size"], list(scratchpad.DEFAULT_SLOT_SIZE))
                 self.run_command("toggle")
                 self.assertEqual(self.desktop.windows[1], background)
                 self.assertEqual(self.desktop.windows[2]["is_floating"], floating)
@@ -151,16 +153,16 @@ class ScratchpadTests(unittest.TestCase):
         self.assertEqual(self.desktop.windows[2]["workspace_id"], 10)
         self.assertTrue(self.desktop.windows[2]["is_focused"])
 
-    def test_legacy_slot_is_reset_to_centered_native_size_once(self):
+    def test_legacy_full_width_slot_is_reset_to_original_size_once(self):
         self.desktop.windows[2]["is_floating"] = True
         self.desktop.windows[2]["layout"] = {"window_size": [640, 480], "tile_pos_in_workspace_view": [20.0, 60.0]}
-        self.state["slot"] = {"output": "A", "bounds": {"x": 160, "y": 100, "width": 760, "height": 600}}
+        self.state["slot"] = {"output": "A", "bounds": {"x": 4, "y": 48, "width": 1912, "height": 1028}}
         self.run_command("stash")
         self.run_command("toggle")
         layout = self.desktop.windows[2]["layout"]
-        self.assertEqual(layout["window_size"], [640, 480])
-        self.assertEqual(layout["tile_pos_in_workspace_view"], [640.0, 300.0])
-        self.assertEqual(self.state["slot"]["bounds"]["width"], 640)
+        self.assertEqual(layout["window_size"], [954, 1028])
+        self.assertEqual(layout["tile_pos_in_workspace_view"], [483.0, 26.0])
+        self.assertEqual(self.state["slot"]["bounds"]["width"], 954)
         # Do not center again on every invocation or lose a later user adjustment.
         self.desktop.windows[2]["layout"]["tile_pos_in_workspace_view"] = [100.0, 150.0]
         self.run_command("toggle")
