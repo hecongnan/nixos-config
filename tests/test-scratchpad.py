@@ -60,8 +60,8 @@ class Desktop:
                 window["is_focused"] = False
         elif name == "FocusWindow":
             self.focus(arguments["id"])
-        elif name == "MoveWindowToFloating":
-            self.windows[arguments["id"]]["is_floating"] = True
+        elif name in ("MoveWindowToFloating", "MoveWindowToTiling"):
+            self.windows[arguments["id"]]["is_floating"] = name == "MoveWindowToFloating"
 
 
 class ScratchpadTests(unittest.TestCase):
@@ -77,7 +77,7 @@ class ScratchpadTests(unittest.TestCase):
         self.assertEqual(self.desktop.windows[2]["workspace_id"], 20)
         self.assertTrue(self.desktop.windows[1]["is_focused"])
         self.run_command("toggle")
-        self.assertFalse(self.desktop.windows[2]["is_floating"])
+        self.assertTrue(self.desktop.windows[2]["is_floating"])
         self.assertTrue(self.desktop.windows[2]["is_focused"])
         self.run_command("toggle")
         self.assertEqual(self.desktop.windows[2]["workspace_id"], 20)
@@ -98,15 +98,38 @@ class ScratchpadTests(unittest.TestCase):
                 background = copy.deepcopy(self.desktop.windows[1])
                 original_layout = copy.deepcopy(self.desktop.windows[2]["layout"])
                 self.run_command("toggle")
-                self.assertEqual(self.desktop.windows[2]["is_floating"], floating)
+                self.assertTrue(self.desktop.windows[2]["is_floating"])
                 self.assertEqual(self.desktop.windows[2]["layout"], original_layout)
                 self.run_command("toggle")
                 self.assertEqual(self.desktop.windows[1], background)
                 self.assertEqual(self.desktop.windows[2]["is_floating"], floating)
                 self.assertFalse(any(name in {
-                    "MoveWindowToFloating", "MoveWindowToTiling", "CenterWindow",
+                    "CenterWindow",
                     "SetWindowWidth", "SetWindowHeight", "MoveFloatingWindow"
                 } for name, _ in self.desktop.actions))
+
+    def test_temporary_floating_does_not_reflow_destination(self):
+        self.run_command("stash")
+        self.desktop.actions.clear()
+        self.run_command("toggle")
+        names = [name for name, _ in self.desktop.actions]
+        self.assertLess(names.index("MoveWindowToFloating"), names.index("MoveWindowToWorkspace"))
+        self.desktop.focus(1)
+        self.run_command("toggle")
+        self.assertFalse(self.state["restore_modes"]["2"])
+        self.desktop.actions.clear()
+        self.run_command("toggle")
+        names = [name for name, _ in self.desktop.actions]
+        self.assertLess(names.index("MoveWindowToWorkspace"), names.index("MoveWindowToTiling"))
+        self.assertFalse(self.desktop.windows[2]["is_floating"])
+        self.assertNotIn("2", self.state["restore_modes"])
+
+    def test_release_keeps_temporary_floating_and_discards_restore_mode(self):
+        self.run_command("stash")
+        self.run_command("toggle")
+        self.run_command("release")
+        self.assertTrue(self.desktop.windows[2]["is_floating"])
+        self.assertNotIn("2", self.state["restore_modes"])
 
     def test_refocus_visible_window_does_not_reinsert_or_reposition(self):
         self.run_command("stash")
@@ -124,7 +147,7 @@ class ScratchpadTests(unittest.TestCase):
         self.run_command("next")
         self.assertEqual(self.desktop.windows[2]["workspace_id"], 10)
         self.assertTrue(self.desktop.windows[2]["is_focused"])
-        self.assertFalse(self.desktop.windows[2]["is_floating"])
+        self.assertTrue(self.desktop.windows[2]["is_floating"])
 
     def test_cross_monitor_summon_uses_global_workspace_id(self):
         self.run_command("stash")
@@ -234,6 +257,8 @@ class ScratchpadTests(unittest.TestCase):
                 for command in ("stash", "toggle", "toggle", "toggle"):
                     with patch.object(scratchpad.sys, "argv", ["scratchpad.py", command]):
                         scratchpad.main()
+                        if command == "toggle" and self.desktop.windows[2]["workspace_id"] == 20:
+                            self.assertFalse(self.desktop.windows[2]["is_floating"])
                 saved = json.loads(next(Path(directory).glob("*.json")).read_text())
                 self.assertEqual(saved["order"], [2])
                 self.assertTrue(self.desktop.windows[2]["is_focused"])

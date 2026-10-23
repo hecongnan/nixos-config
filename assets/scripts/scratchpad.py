@@ -66,6 +66,10 @@ def manage(niri, state, command, workspace_name="scratch"):
     order.extend(wid for wid, w in windows.items()
                  if w["workspace_id"] == stash["id"] and wid not in order)
     state["order"] = order
+    modes = state.setdefault("restore_modes", {})
+    for key in list(modes):
+        if key not in {str(wid) for wid in windows}:
+            del modes[key]
 
     def move(wid, workspace_id):
         # IDs are global across outputs; indices are local to each monitor.
@@ -75,6 +79,15 @@ def manage(niri, state, command, workspace_name="scratch"):
     def hide(window):
         nonlocal current
         move(window["id"], stash["id"])
+        # Restore the pre-summon mode only after leaving the visible workspace,
+        # so restoring tiling cannot reflow its other windows.
+        key = str(window["id"])
+        if key in modes:
+            original_floating = modes[key]
+            if original_floating != window.get("is_floating", False):
+                niri.action("MoveWindowToFloating" if original_floating else "MoveWindowToTiling",
+                            id=window["id"])
+            del modes[key]
         # Niri can remove an emptied unnamed workspace and focus scratch.
         # Keep the user on an ordinary workspace, including before cycling.
         available = niri.query("Workspaces")
@@ -111,6 +124,7 @@ def manage(niri, state, command, workspace_name="scratch"):
     if command == "release":
         if focused and focused["id"] in order:
             order.remove(focused["id"])
+            modes.pop(str(focused["id"]), None)
             state.pop("return_window", None)
         return
 
@@ -132,6 +146,11 @@ def manage(niri, state, command, workspace_name="scratch"):
     target_window = next((w for w in live if w["id"] == target), None)
     if target_window is None:
         return
+    # Floating is temporary: remember the mode before the first summon, and
+    # convert while still hidden so the destination's tiling stays untouched.
+    modes.setdefault(str(target), target_window.get("is_floating", False))
+    if not target_window.get("is_floating", False):
+        niri.action("MoveWindowToFloating", id=target)
     # Refocusing a visible scratchpad must not reinsert its column or change
     # its floating position. Preserve the original return focus as well.
     if target_window["workspace_id"] == current["id"]:
