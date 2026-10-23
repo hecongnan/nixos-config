@@ -53,6 +53,11 @@ class Desktop:
                               if w["workspace_id"] == old_workspace), None)
                 if other:
                     self.focus(other["id"])
+        elif name == "FocusWorkspace":
+            for workspace in self.workspaces:
+                workspace["is_focused"] = workspace["id"] == arguments["reference"]["Id"]
+            for window in self.windows.values():
+                window["is_focused"] = False
         elif name == "FocusWindow":
             self.focus(arguments["id"])
         elif name == "MoveWindowToFloating":
@@ -142,12 +147,40 @@ class ScratchpadTests(unittest.TestCase):
         self.run_command("stash")
         self.assertEqual(self.desktop.actions, [])
 
-    def test_stash_workspace_is_never_a_summon_destination(self):
-        self.desktop.workspaces[0]["is_focused"] = False
-        self.desktop.workspaces[1]["is_focused"] = True
-        with self.assertRaisesRegex(RuntimeError, "普通工作区"):
-            self.run_command("toggle")
-        self.assertEqual(self.desktop.actions, [])
+    def test_toggle_from_stash_recovers_to_ordinary_workspace(self):
+        self.run_command("stash")
+        self.desktop.focus(2)
+        self.run_command("toggle")
+        self.assertEqual(self.desktop.windows[2]["workspace_id"], 10)
+        self.assertTrue(self.desktop.windows[2]["is_focused"])
+        self.assertIn(("FocusWorkspace", {"reference": {"Id": 10}}), self.desktop.actions)
+
+    def test_recovery_falls_back_when_last_workspace_disappeared(self):
+        self.run_command("stash")
+        self.state["last_workspace"] = 999
+        self.desktop.focus(2)
+        self.run_command("toggle")
+        self.assertNotEqual(self.desktop.windows[2]["workspace_id"], 20)
+        self.assertTrue(self.desktop.windows[2]["is_focused"])
+
+    def test_stashing_last_window_keeps_focus_outside_stash(self):
+        original_action = self.desktop.action
+        def remove_emptied_workspace(name, **arguments):
+            old_workspace = self.desktop.windows.get(arguments.get("window_id"), {}).get("workspace_id")
+            original_action(name, **arguments)
+            if name == "MoveWindowToWorkspace" and not any(
+                w["workspace_id"] == old_workspace for w in self.desktop.windows.values()
+            ):
+                self.desktop.workspaces = [w for w in self.desktop.workspaces if w["id"] != old_workspace]
+                self.desktop.focus(arguments["window_id"])
+        self.desktop.action = remove_emptied_workspace
+        self.run_command("stash")
+        self.run_command("stash")
+        focused = next(w for w in self.desktop.workspaces if w["is_focused"])
+        self.assertEqual(focused["id"], 30)
+        self.run_command("toggle")
+        self.assertEqual(self.desktop.windows[1]["workspace_id"], 30)
+        self.assertTrue(self.desktop.windows[1]["is_focused"])
 
     def test_membership_survives_separate_command_invocations(self):
         with tempfile.TemporaryDirectory() as directory:

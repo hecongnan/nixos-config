@@ -41,8 +41,22 @@ def manage(niri, state, command, workspace_name="scratch"):
         raise RuntimeError(f"缺少工作区 {workspace_name!r}，请先应用 scratchpad 配置")
     if current is None:
         return
-    if current["id"] == stash["id"]:
-        raise RuntimeError("请先切回普通工作区；scratch 暂存区中的窗口也可手动移出")
+    def ordinary_workspace(available):
+        ordinary = [w for w in available if w["id"] != stash["id"]]
+        return next((w for w in ordinary if w["id"] == state.get("last_workspace")),
+                    next((w for w in ordinary if w.get("output") == current.get("output")),
+                         next(iter(ordinary), None)))
+
+    recovering = current["id"] == stash["id"]
+    if recovering:
+        if command not in ("toggle", "next"):
+            return
+        destination = ordinary_workspace(workspaces)
+        if destination is None:
+            raise RuntimeError("没有可用的普通工作区")
+        niri.action("FocusWorkspace", reference={"Id": destination["id"]})
+        current = destination
+    state["last_workspace"] = current["id"]
 
     windows = {w["id"]: w for w in niri.query("Windows")}
     focused = next((w for w in windows.values() if w["is_focused"]), None)
@@ -59,7 +73,19 @@ def manage(niri, state, command, workspace_name="scratch"):
                     reference={"Id": workspace_id}, focus=False)
 
     def hide(window):
+        nonlocal current
         move(window["id"], stash["id"])
+        # Niri can remove an emptied unnamed workspace and focus scratch.
+        # Keep the user on an ordinary workspace, including before cycling.
+        available = niri.query("Workspaces")
+        active = next((w for w in available if w["is_focused"]), None)
+        if active and active["id"] == stash["id"]:
+            active = ordinary_workspace(available)
+            if active:
+                niri.action("FocusWorkspace", reference={"Id": active["id"]})
+        if active and active["id"] != stash["id"]:
+            current = active
+            state["last_workspace"] = current["id"]
         previous = windows.get(state.get("return_window"))
         if (window["is_focused"] and previous is not None
                 and previous["id"] != window["id"]
@@ -90,7 +116,7 @@ def manage(niri, state, command, workspace_name="scratch"):
 
     # Hide the focused scratchpad before toggling off or cycling. An unfocused
     # scratchpad is brought into focus, rather than unexpectedly disappearing.
-    if focused and focused["id"] in order:
+    if focused and focused["id"] in order and not recovering:
         order.remove(focused["id"])
         order.append(focused["id"])
         hide(focused)
