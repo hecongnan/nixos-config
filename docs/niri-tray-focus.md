@@ -3,7 +3,7 @@
 本仓库通过 flake input `dms-tray-focus` 引用独立公开补丁：
 https://github.com/hecongnan/dms-niri-tray-focus
 
-当前固定提交：`28bc757b2a2885b5cf99a1bcccd25caa6c1f8636`。
+当前固定提交：`7d86167f9ffb5183c4f367a31913f60969c5df4e`。
 源码和安装器由独立仓库维护，NixOS 配置自动获取脚本和补丁，无需手工克隆或运行安装器。
 
 `home/aurora/desktop.nix` 从当前 `pkgs.dms-shell.src` 复制完整界面及其
@@ -41,3 +41,11 @@ Nix 语法解析、完整 NixOS 系统 derivation 求值和聚焦脚本包装器
 补丁界面构建需要下载 DMS 软件包的完整源码与子模块；该源码获取已因 GitHub TLS 中断失败，
 尚未宣称完整界面构建或系统切换成功。现有本机修复保持原来的加载方式，
 本次提交只更新仓库，不执行系统切换。
+
+## FlClash 隐藏窗口恢复（2026-10-23）
+
+固定补丁版本现在额外支持 FlClash 的 Ayatana 托盘：该托盘没有 Activate 接口，
+窗口隐藏后不在 niri 窗口列表中。脚本会查找明确的“显示 / Show / 顯示”菜单项，
+调用后等待窗口出现再聚焦，不触发代理模式、暂停或退出操作。
+本机已验证“显示”菜单恢复窗口和脚本聚焦；独立仓库 6 项回归测试通过。
+现有本机的用户服务覆盖仍使用本地脚本，本次已更新该脚本，无需 rebuild。

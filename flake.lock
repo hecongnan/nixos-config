@@ -128,17 +128,17 @@
     "dms-tray-focus": {
       "flake": false,
       "locked": {
-        "lastModified": 1792461066,
-        "narHash": "sha256-YNTSWREHyy5K/KiccwpVW41ydm1QJ4IsrBdw38iMyHs=",
+        "lastModified": 1792715753,
+        "narHash": "sha256-lbOk71mzRGAF7gMl+YqrWVqm89NeYx+Tqx+/ZyAU8CM=",
         "owner": "hecongnan",
         "repo": "dms-niri-tray-focus",
-        "rev": "28bc757b2a2885b5cf99a1bcccd25caa6c1f8636",
+        "rev": "7d86167f9ffb5183c4f367a31913f60969c5df4e",
         "type": "github"
       },
       "original": {
         "owner": "hecongnan",
         "repo": "dms-niri-tray-focus",
-        "rev": "28bc757b2a2885b5cf99a1bcccd25caa6c1f8636",
+        "rev": "7d86167f9ffb5183c4f367a31913f60969c5df4e",
         "type": "github"
       }
     },

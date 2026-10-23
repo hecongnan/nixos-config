@@ -17,7 +17,7 @@
     };
     # Standalone patch, pinned independently from the desktop configuration.
     dms-tray-focus = {
-      url = "github:hecongnan/dms-niri-tray-focus/28bc757b2a2885b5cf99a1bcccd25caa6c1f8636";
+      url = "github:hecongnan/dms-niri-tray-focus/7d86167f9ffb5183c4f367a31913f60969c5df4e";
       flake = false;
     };
     nvim-config = {
