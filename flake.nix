@@ -71,6 +71,8 @@
           mkdir -p assets/scripts tests
           cp ${./assets/scripts/scratchpad.py} assets/scripts/scratchpad.py
           cp ${./tests/test-scratchpad.py} tests/test-scratchpad.py
+          cp ${./tests/test_scratchpad.py} tests/test_scratchpad.py
+          cp ${./tests/test_auto_workspaces.py} tests/test_auto_workspaces.py
           python3 tests/test-scratchpad.py
           touch "$out"
         '';

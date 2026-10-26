@@ -11,8 +11,8 @@
 
         binds {
             Mod+Shift+grave repeat=false hotkey-overlay-title="Scratchpad: 收起当前窗口" { spawn ${command} "stash"; }
-            Mod+grave repeat=false hotkey-overlay-title="Scratchpad: 呼出／收起" { spawn ${command} "toggle"; }
-            Mod+Ctrl+grave repeat=false hotkey-overlay-title="Scratchpad: 下一个窗口" { spawn ${command} "next"; }
+            Mod+grave repeat=false hotkey-overlay-title="Scratchpad: 呼出／收起" { spawn ${command} "toggle" "--all-workspaces"; }
+            Mod+Ctrl+grave repeat=false hotkey-overlay-title="Scratchpad: 下一个窗口" { spawn ${command} "next" "--all-workspaces"; }
         }
       '';
 }
