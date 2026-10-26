@@ -6,10 +6,11 @@ https://github.com/hecongnan/dms-niri-tray-focus
 当前固定提交：`7d86167f9ffb5183c4f367a31913f60969c5df4e`。
 源码和安装器由独立仓库维护，NixOS 配置自动获取脚本和补丁，无需手工克隆或运行安装器。
 
-`home/aurora/desktop.nix` 从当前 `pkgs.dms-shell.src` 复制完整界面及其
-DankCommon 子模块，在构建阶段应用补丁，生成仅供 DMS 使用的界面副本。
-脚本所需的 Python、niri、busctl 由 Nix 包装器提供；用户服务设置
-DMS_SHELL_DIR 和 DMS_TRAY_FOCUS_HELPER，使重启和系统恢复后自动加载。
+`home/aurora/desktop.nix` 从锁定的 `inputs.dms` 复制 1.6.2 界面，并从该输入锁定的
+`dank-qml-common` 补齐 DankCommon；构建时应用托盘补丁。CLI 也使用相同的锁定 DMS 版本。
+脚本所需的 Python、niri、busctl 由 Nix 包装器提供。用户服务除了设置
+DMS_SHELL_DIR 和 DMS_TRAY_FOCUS_HELPER，还必须显式传入 `--config` 选择补丁界面：
+软件包包装器自带的 `-c` 参数会优先于环境变量，只设置环境变量无法保证加载补丁。
 补丁目前仅适配 DMS 1.6.2，升级版本会在构建时拒绝继续，需要先适配。
 
 ## 部署与恢复
@@ -25,11 +26,13 @@ DMS_SHELL_DIR 和 DMS_TRAY_FOCUS_HELPER，使重启和系统恢复后自动加�
 验证 DMS 服务实际环境：
 
 ```sh
-systemctl --user show dms.service -p Environment
+systemctl --user show dms.service -p Environment -p ExecStart
 systemctl --user is-active dms.service
 ```
 
 DMS_SHELL_DIR、DMS_TRAY_FOCUS_HELPER 应指向 /nix/store 中的构建结果。
+ExecStart 的 `--config` 也应指向同一补丁界面。还需检查本次启动日志中的
+`Launching config` 路径；环境变量存在本身不足以证明补丁已加载。
 
 ## 更新补丁
 
@@ -37,10 +40,11 @@ DMS_SHELL_DIR、DMS_TRAY_FOCUS_HELPER 应指向 /nix/store 中的构建结果。
 
 ## 验证
 
-Nix 语法解析、完整 NixOS 系统 derivation 求值和聚焦脚本包装器构建已通过。
-补丁界面构建需要下载 DMS 软件包的完整源码与子模块；该源码获取已因 GitHub TLS 中断失败，
-尚未宣称完整界面构建或系统切换成功。现有本机修复保持原来的加载方式，
-本次提交只更新仓库，不执行系统切换。
+2026-10-26 已完成完整系统构建及切换，并核对当前进程实际加载补丁版界面。
+托盘脚本 6 项回归测试通过；微信、FlClash、Chromium 托盘能够匹配已有窗口。
+详细结果和交互测试边界见 [补丁配置审查](patch-audit-2026-10-26.md)。
+
+可运行只读检查：`python3 scripts/audit-patches.py`。
 
 ## FlClash 隐藏窗口恢复（2026-10-23）
 
@@ -48,4 +52,4 @@ Nix 语法解析、完整 NixOS 系统 derivation 求值和聚焦脚本包装器
 窗口隐藏后不在 niri 窗口列表中。脚本会查找明确的“显示 / Show / 顯示”菜单项，
 调用后等待窗口出现再聚焦，不触发代理模式、暂停或退出操作。
 本机已验证“显示”菜单恢复窗口和脚本聚焦；独立仓库 6 项回归测试通过。
-现有本机的用户服务覆盖仍使用本地脚本，本次已更新该脚本，无需 rebuild。
+2026-10-26 已切换到 Nix 管理的脚本，旧的本地服务覆盖已备份停用。

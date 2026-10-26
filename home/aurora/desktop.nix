@@ -1,5 +1,7 @@
 { config, lib, pkgs, inputs, osConfig, ... }:
 let
+  # Keep the CLI and patched UI on the same explicitly pinned DMS release.
+  dmsPackage = inputs.dms.lib.mkDmsShell pkgs;
   trayFocus = pkgs.writeShellApplication {
     name = "dms-focus-tray-window";
     runtimeInputs = [ pkgs.python3 pkgs.niri pkgs.systemd ];
@@ -11,8 +13,11 @@ let
     nativeBuildInputs = [ pkgs.patch ];
   } ''
     mkdir -p "$out"
-    # Reuse the exact packaged UI and its bundled DankCommon submodule.
-    cp -aL ${pkgs.dms-shell.src}/quickshell/. "$out/"
+    # GitHub flake sources omit submodules; use the same locked common UI as DMS.
+    cp -a ${inputs.dms}/quickshell/. "$out/"
+    chmod u+w "$out"
+    rm -f "$out/DankCommon"
+    cp -aL ${inputs.dms.inputs.dank-qml-common}/DankCommon "$out/DankCommon"
     chmod -R u+w "$out"
     test "$(tr -d '\n' < "$out/VERSION")" = "v1.6.2"
     cd "$out"
@@ -36,7 +41,7 @@ in
   imports = [ inputs.dms.homeModules.dank-material-shell ./scratchpad.nix ];
   programs.dank-material-shell = {
     enable = true;
-    package = pkgs.dms-shell;
+    package = dmsPackage;
     quickshell.package = pkgs.quickshell;
     systemd.enable = true;
     systemd.target = "graphical-session.target";
@@ -74,6 +79,8 @@ in
   systemd.user.services.dms = {
     Unit = { After = [ "niri.service" ]; Requisite = [ "niri.service" ]; };
     Service = {
+      # The package wrapper supplies -c, which takes precedence over DMS_SHELL_DIR.
+      ExecStart = lib.mkForce "${lib.getExe dmsPackage} --config ${trayFocusShell} run --session";
       ExecStartPre = lib.getExe initialize;
       Environment = [
         "QT_QPA_PLATFORM=wayland"
@@ -89,13 +96,13 @@ in
   services.swayidle = {
     enable = true;
     timeouts = [
-      { timeout = 300; command = "${pkgs.dms-shell}/bin/dms ipc call lock lock"; }
+      { timeout = 300; command = "${dmsPackage}/bin/dms ipc call lock lock"; }
       { timeout = 600; command = "${pkgs.niri}/bin/niri msg action power-off-monitors";
         resumeCommand = "${pkgs.niri}/bin/niri msg action power-on-monitors"; }
     ];
     events = {
-      before-sleep = "${pkgs.dms-shell}/bin/dms ipc call lock lock";
-      lock = "${pkgs.dms-shell}/bin/dms ipc call lock lock";
+      before-sleep = "${dmsPackage}/bin/dms ipc call lock lock";
+      lock = "${dmsPackage}/bin/dms ipc call lock lock";
     };
   };
 }
