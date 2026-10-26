@@ -103,26 +103,30 @@ def manage(niri, state, command, workspace_name="scratch"):
                         y={"AdjustFixed": bounds["y"] - current_bounds["y"]})
 
     def center_slot(wid):
-        # Use the original observed window size, not a maximized app's size.
+        # Retain pending initialization on timeout; a later summon/refocus can
+        # retry, but must not adopt the client's pre-resize geometry as a slot.
+        state["center_slot"] = True
         width, height = DEFAULT_SLOT_SIZE
         niri.action("SetWindowWidth", id=wid, change={"SetFixed": width})
         niri.action("SetWindowHeight", id=wid, change={"SetFixed": height})
-        # Wayland clients acknowledge resize asynchronously. Do not save the
-        # old full-width geometry as the shared slot before they respond.
         deadline = time.monotonic() + 0.5
         while True:
             window = next((w for w in niri.query("Windows") if w["id"] == wid), None)
-            if (window is None or not window.get("layout")
-                    or window.get("layout", {}).get("window_size") == [width, height]
-                    or time.monotonic() >= deadline):
+            if window is None or not window.get("layout"):
+                return False
+            if window["layout"].get("window_size") == [width, height]:
                 break
+            if time.monotonic() >= deadline:
+                return False
             time.sleep(0.02)
         niri.action("CenterWindow", id=wid)
         window = next((w for w in niri.query("Windows") if w["id"] == wid), None)
         bounds = geometry(window) if window else None
-        if bounds:
-            state["slot"] = {"output": current.get("output"), "bounds": bounds}
+        if not bounds or (bounds["width"], bounds["height"]) != (width, height):
+            return False
+        state["slot"] = {"output": current.get("output"), "bounds": bounds}
         state.pop("center_slot", None)
+        return True
 
     def move(wid, workspace_id):
         # IDs are global across outputs; indices are local to each monitor.
@@ -221,6 +225,16 @@ def manage(niri, state, command, workspace_name="scratch"):
     target_window = next((w for w in live if w["id"] == target), None)
     if target_window is None:
         return
+    # A visible member may have been manually retiled. Refocusing must not
+    # change its mode, its backups, or the background layout. Only finish a
+    # pending initial resize when it is still temporarily floating.
+    if target_window["workspace_id"] == current["id"]:
+        if (state.get("center_slot") and target_window.get("is_floating")
+                and str(target) in modes):
+            center_slot(target)
+        state["visible_window"] = target
+        niri.action("FocusWindow", id=target)
+        return
     # Floating is temporary: remember the mode before the first summon, and
     # convert while still hidden so the destination's tiling stays untouched.
     modes.setdefault(str(target), target_window.get("is_floating", False))
@@ -231,23 +245,14 @@ def manage(niri, state, command, workspace_name="scratch"):
         bounds = geometry(target_window)
         if bounds:
             geometries[str(target)] = bounds
-    # Refocusing a visible scratchpad must not reinsert its column or change
-    # its floating position. Preserve the original return focus as well.
-    if target_window["workspace_id"] == current["id"]:
-        if state.get("center_slot"):
-            if str(target) in geometries:
-                place(target, geometries[str(target)])
-            center_slot(target)
-        state["visible_window"] = target
-        niri.action("FocusWindow", id=target)
-        return
     # The fresh query above also captures the actual return focus after cycling.
     previous = next((w for w in live if w["is_focused"]), None)
     if previous and previous["id"] != target:
         state["return_window"] = previous["id"]
     move(target, current["id"])
     slot = state.get("slot", {})
-    if slot.get("output") == current.get("output") and slot.get("bounds"):
+    if (not state.get("center_slot") and slot.get("output") == current.get("output")
+            and slot.get("bounds")):
         place(target, slot["bounds"])
     else:
         center_slot(target)
