@@ -14,17 +14,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1791330835,
-        "narHash": "sha256-VRZEDOpDif9+FgixELmupg9KO5lx6LytLA3XfI6uoKI=",
+        "lastModified": 1793897345,
+        "narHash": "sha256-Su1VsqA8ohiMZw445B5NokwSEgMSL4zwXdh85Ensgms=",
         "owner": "ilysenko",
         "repo": "codex-desktop-linux",
-        "rev": "03c41abe0d1119c5a015fe29d3aad821ad4549bf",
+        "rev": "25f308a66ae97ff01e6d3d77f9ff0cf685138575",
         "type": "github"
       },
       "original": {
         "owner": "ilysenko",
         "repo": "codex-desktop-linux",
-        "rev": "03c41abe0d1119c5a015fe29d3aad821ad4549bf",
+        "rev": "25f308a66ae97ff01e6d3d77f9ff0cf685138575",
         "type": "github"
       }
     },

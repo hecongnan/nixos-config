@@ -27,7 +27,7 @@
     computer-use.url = "github:lihaoze123/niri-computer-use";
     # Keep the desktop version used in the blueprint and the cached backend pins.
     codex-desktop = {
-      url = "github:ilysenko/codex-desktop-linux/03c41abe0d1119c5a015fe29d3aad821ad4549bf";
+      url = "github:ilysenko/codex-desktop-linux/25f308a66ae97ff01e6d3d77f9ff0cf685138575";
       inputs.nixpkgs.follows = "computer-use/codex-desktop-linux/nixpkgs";
       inputs.flake-utils.follows = "computer-use/codex-desktop-linux/flake-utils";
     };
