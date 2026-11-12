@@ -19,10 +19,10 @@
 }:
 stdenv.mkDerivation {
   pname = "flclash-bin";
-  version = "0.8.99";
+  version = "0.9.3";
   src = fetchurl {
-    url = "https://github.com/chen08209/FlClash/releases/download/v0.8.99/FlClash-0.8.99-linux-amd64.deb";
-    hash = "sha256-3Vtg1oqvsPdiaS1JcFD9Lty913L0xTgioG6yg3y/iF8=";
+    url = "https://github.com/chen08209/FlClash/releases/download/v0.9.3/FlClash-0.9.3-linux-amd64.deb";
+    hash = "sha256-QGQlQym7OcYonHQ+FuVyauVrWFPobZ+I4BReKvAyNRs=";
   };
   nativeBuildInputs = [ dpkg autoPatchelfHook makeWrapper ];
   buildInputs = [

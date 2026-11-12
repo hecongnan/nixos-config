@@ -25,7 +25,10 @@ pkgs.buildEnv {
     (python3.withPackages (ps: [ ps.pip ps.pynvim ]))
     lua-language-server
     bash-language-server
-    neocmakelsp
+    (neocmakelsp.overrideAttrs (old: {
+      nativeBuildInputs = (old.nativeBuildInputs or []) ++ [ pkgs.pkg-config ];
+      buildInputs = (old.buildInputs or []) ++ [ pkgs.oniguruma ];
+    }))
     taplo
     stylua
     shfmt

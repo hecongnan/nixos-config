@@ -2,10 +2,10 @@
 { lib, stdenvNoCC, fetchurl, zstd }:
 stdenvNoCC.mkDerivation {
   pname = "codex-cli";
-  version = "0.162.1";
+  version = "0.167.2";
   src = fetchurl {
-    url = "https://github.com/openai/codex/releases/download/rust-v0.162.1/codex-package-x86_64-unknown-linux-musl.tar.zst";
-    hash = "sha256-vSTQK+Z4iUtHvFZb0tqNR6BeOn3Qtu9mqpVymbJOyPI=";
+    url = "https://github.com/openai/codex/releases/download/rust-v0.167.2/codex-package-x86_64-unknown-linux-musl.tar.zst";
+    hash = "sha256-u+p7mmj0ULOvGONhMO+Ih+bqQpCxz8MJZnjrbL6fPzQ=";
   };
   nativeBuildInputs = [ zstd ];
   sourceRoot = ".";
