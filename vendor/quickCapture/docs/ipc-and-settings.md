@@ -6,7 +6,7 @@ This reference outlines the IPC interface, keyboard/mouse shortcut registries, a
 
 ## 1. IPC (Inter-Process Communication) Interface
 
-You can interact with Quick Capture from external scripts, keyboard shortcut managers, or status bar launchers using the DMS IPC commands:
+You can interact with Quick Capture from external scripts, keyboard shortcut managers, or status bar launchers using Dux Shell IPC commands (`dms ipc`):
 
 ```bash
 dms ipc call quickCapture <command> [arg] edit|float
@@ -14,15 +14,17 @@ dms ipc call quickCapture <command> [arg] edit|float
 
 ### Supported Commands
 
-Commands that capture or open images accept an `action` parameter (`edit` / `float`):
+Commands that capture or open images accept an `action` parameter (`edit`, `float`, `copy`, `save`, `copyAndSave`):
 
 | Command | Arguments | Description |
 | :--- | :--- | :--- |
+| `open` | *(none)* | Opens the centered Quick Capture menu modal. |
+| `toggle` / `menu` | *(none)* | Toggles the centered Quick Capture menu modal. |
 | `screenshot` | `mode` (`region`, `full`, `all`, `output`, `window`, `last`, `scroll`) | Triggers a screenshot. |
 | `selectFile` | `action` | Opens file picker. |
 | `fromClipboard` | `action` | Imports image from clipboard. |
 | `openImage` | `path`, `action` | Opens a local image file. |
-| `close` | *(none)* | Closes the annotator. |
+| `close` | *(none)* | Closes the annotator or menu modal. |
 | `showHistory` | *(none)* | Opens the Recent Edits history carousel. |
 | `recordStart` | `mode` (`screen`, `region`, `portal`) | Starts screen recording. |
 | `recordStop` | *(none)* | Stops screen recording. |
@@ -32,11 +34,15 @@ Commands that capture or open images accept an `action` parameter (`edit` / `flo
 | `recordStatus` | *(none)* | Returns recorder status. |
 
 ```bash
-dms ipc call quickCapture screenshot region edit    # open editor
-dms ipc call quickCapture screenshot region float   # float directly
-dms ipc call quickCapture recordStart region        # record selected region
-dms ipc call quickCapture recordStop                # stop recording
+dms ipc call quickCapture toggle                          # toggle centered menu
+dms ipc call quickCapture screenshot region edit          # open editor
+dms ipc call quickCapture screenshot region float         # float directly
+dms ipc call quickCapture screenshot full copyAndSave     # save, copy, and notify with Edit action
+dms ipc call quickCapture recordStart region              # record selected region
+dms ipc call quickCapture recordStop                      # stop recording
 ```
+
+> **Capture & Annotate on Demand**: Using `save` or `copyAndSave` saves the screenshot immediately without opening the editor. When **Post-action Notification** (`postNotification`) is set to `notification` or `both` (for non-PDF outputs), the notification includes **Edit**, **Open**, and **Open Folder** buttons so you can open the saved image in the annotator only when needed.
 
 ### Integration Examples
 
@@ -113,7 +119,7 @@ Pressing these keys changes the active tool:
 
 ## 3. Configuration & State Schema (`plugin.json`)
 
-The following settings are registered inside DMS settings manager and stored in `~/.config/DankMaterialShell/settings/quickCapture.json`:
+The following settings are registered inside the Dux Shell settings manager and stored in `~/.config/DankMaterialShell/settings/quickCapture.json`:
 
 ```json
 {
@@ -136,4 +142,4 @@ The following settings are registered inside DMS settings manager and stored in 
   }
 }
 ```
-*(Values can be customized via the Quick Capture Settings tab in DMS panel settings).*
+*(Values can be customized via the Quick Capture Settings tab in Dux Shell panel settings).*

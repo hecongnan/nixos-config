@@ -27,8 +27,12 @@ const values = {
     recordMic: false,
     micDevice: "default_input",
     audioCodec: "opus",
+    recordingStatusLocation: "auto",
     showPillBorder: false,
     blinkRecordDot: true,
+    showRecordingDot: true,
+    showRecordingTimer: true,
+    showRecordingControls: true,
     showRegionBorder: true,
     doneAction: "both",
     saveDirectory: "~/Pictures/Screenshots",
@@ -55,6 +59,7 @@ const values = {
     defaultToolMode: "preset",
     defaultPresetIndex: "0",
     defaultTool: "pen",
+    ocrLanguage: "eng",
     textFontFamily: "system",
     stampFontFamily: "system",
     textBold: false,
@@ -109,7 +114,7 @@ const values = {
     radialMenuOpacity: 100
 };
 
-function get(data, key) {
+function get(data, key, fallback) {
     const value = data ? data[key] : undefined;
-    return value === undefined || value === null ? values[key] : value;
+    return value === undefined || value === null ? (fallback === undefined ? values[key] : fallback) : value;
 }

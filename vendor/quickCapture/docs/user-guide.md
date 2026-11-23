@@ -4,18 +4,20 @@
 
 | Action | Result |
 | --- | --- |
-| **Left Click** | Open the widget popout |
+| **Left Click** | Open the widget popout / attached dock panel |
 | **Middle Click** | Region capture |
 | **Right Click** | Paste from clipboard |
 | **Drop Image** | Drag an image onto the icon to annotate |
 | **<kbd>Print</kbd>** | Capture using the default mode |
 
-1. Trigger a capture from the bar icon, Control Center, or <kbd>Print</kbd>.
+1. Trigger a capture from the bar or dock icon, Control Center, or <kbd>Print</kbd>.
 2. Drag to select an area.
    Drag one of the four corner handles to resize the current selection.
    Hold <kbd>Ctrl</kbd> and drag with the left mouse button to move the current selection without resizing it.
 3. Annotate with the toolbar, shortcuts, or radial menus.
 4. Press <kbd>Enter</kbd> to finish or <kbd>Esc</kbd> to discard.
+
+By default, screenshots are saved to the XDG Pictures directory under `Screenshots`, and recordings to the XDG Videos directory under `Recordings`. You can choose different folders in the Save and Recording settings.
 
 ### Scrolling Capture
 
@@ -128,6 +130,9 @@ Quick Capture supports screen recording via GPU hardware acceleration or CPU fal
   ```
 - **wf-recorder**: Lightweight CPU libx264 backend (fallback; pause/resume and internal audio mixing are not supported).
 
+> [!NOTE]
+> Window mode uses the Wayland ScreenCast portal (`gpu-screen-recorder -w portal`). If recording notifications do not pop up upon completion, go to DMS Settings > **Notifications** > **Do not disturb** and turn off **"Automatically enable while screen sharing"**.
+
 ## Pin to Desktop
 
 - Press <kbd>Ctrl</kbd> + <kbd>F</kbd> to export and float the image.
@@ -137,13 +142,16 @@ Quick Capture supports screen recording via GPU hardware acceleration or CPU fal
 
 ## IPC Commands
 
-Commands that capture or open images accept `edit` or `float` as the action:
+Commands that capture or open images accept `edit`, `float`, `copy`, `save`, or `copyAndSave` as the action:
 
 ```bash
-dms ipc call quickCapture <command> [arg] edit|float
+dms ipc call quickCapture <command> [arg] edit|float|copy|save|copyAndSave
 dms ipc call quickCapture screenshot region edit
 dms ipc call quickCapture screenshot region float
+dms ipc call quickCapture screenshot full copyAndSave
 ```
+
+> **Tip (Capture & Annotate on Demand):** Using `save` or `copyAndSave` skips opening the editor immediately and sends a desktop notification (when `postNotification` is `notification` or `both`) with an **Edit** button to open the saved screenshot in the annotator if needed.
 
 | Command | Arguments | Description |
 | --- | --- | --- |

@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 {
   programs.niri.enable = true;
-  services.displayManager.dms-greeter = {
+  services.displayManager.dux-greeter = {
     enable = true;
     compositor.name = "niri";
     configHome = "/home/${config.my.machine.username}";

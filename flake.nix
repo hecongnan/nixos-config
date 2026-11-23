@@ -12,7 +12,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     dms = {
-      url = "github:AvengeMedia/DankMaterialShell/v1.6.2";
+      url = "github:duxlabs-dev/dux-shell/v2.1.2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Standalone patch, pinned independently from the desktop configuration.
@@ -25,9 +25,9 @@
       flake = false;
     };
     computer-use.url = "github:lihaoze123/niri-computer-use";
-    # Keep the desktop version used in the blueprint and the cached backend pins.
+    # Pin the desktop source while sharing the computer-use backend package set.
     codex-desktop = {
-      url = "github:ilysenko/codex-desktop-linux/25f308a66ae97ff01e6d3d77f9ff0cf685138575";
+      url = "github:ilysenko/codex-desktop-linux/6175ccd9c64857e1cf7105a86ca788c29e107d99";
       inputs.nixpkgs.follows = "computer-use/codex-desktop-linux/nixpkgs";
       inputs.flake-utils.follows = "computer-use/codex-desktop-linux/flake-utils";
     };

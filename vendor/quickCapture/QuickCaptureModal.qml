@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell
 import qs.Common
+import qs.DCommon.Widgets
 import qs.Widgets
 import qs.Modals.Common
 import qs.Modals.FileBrowser
@@ -84,7 +85,7 @@ Item {
         }
     }
 
-    DankModal {
+    DModal {
         id: modalSurface
         shouldBeVisible: window.shouldBeVisible && !window.floatingMode
         shouldHaveFocus: window.shouldHaveFocus && !window.floatingMode
@@ -97,6 +98,8 @@ Item {
         useOverlayLayer: window.useOverlayLayer
         layerNamespace: "dms:plugins:quickCapture"
         keepPopoutsOpen: true
+        positioning: "custom"
+        customPosition: window.modalCustomPosition
         content: window.editorContent
 
         onOpened: window.opened()
@@ -104,7 +107,7 @@ Item {
         onBackgroundClicked: window.backgroundClicked()
     }
 
-    DankFloatingWindow {
+    DFloatingWindow {
         id: floatingSurface
         title: I18n.trFor("quickCapture", "Quick Capture")
         objectName: "quickCaptureEditor"
@@ -1753,7 +1756,7 @@ Item {
             cropCommandId: "crop-ocr-temp",
             scanCommandId: "run-ocr",
             cleanupCommandId: "cleanup-ocr-temp",
-            scanArgs: path => ["tesseract", path, "-", "-l", "eng"],
+            scanArgs: path => ["tesseract", path, "-", "-l", (config && config.ocrLanguage) || "eng"],
             noResultMessage: I18n.trFor("quickCapture", "No text detected"),
             scanErrorMessage: I18n.trFor("quickCapture", "OCR failed")
         };
@@ -1802,12 +1805,48 @@ Item {
         window.runRegionScan(type, crop);
     }
 
+    function screenEdgeInset(side) {
+        const scr = window.presentationScreen;
+        if (!scr)
+            return 0;
+        let inset = 0;
+        if (typeof ShellLayout !== "undefined" && ShellLayout && typeof ShellLayout.edge === "function") {
+            void ShellLayout.layouts;
+            const band = ShellLayout.edge(scr, side);
+            if (band)
+                inset = Math.max(band.reservation ?? 0, band.island ? (band.islandThickness ?? 0) : 0);
+        } else {
+            const posMap = {
+                "top": 0,
+                "bottom": 1,
+                "left": 2,
+                "right": 3
+            };
+            const pos = posMap[side];
+            const bars = SettingsData.barConfigs || [];
+            const hasBar = bars.some(b => (b.enabled ?? true) && (b.visible ?? true) && !b.autoHide && (b.position ?? 0) === pos);
+            if (hasBar)
+                inset = Theme.barHeight + Theme.spacingS;
+        }
+        if (typeof SettingsData.dockReservationForEdge === "function")
+            inset = Math.max(inset, SettingsData.dockReservationForEdge(scr, side));
+        return inset;
+    }
+
+    readonly property real _topChromeInset: screenEdgeInset("top")
+    readonly property real _bottomChromeInset: screenEdgeInset("bottom")
+    readonly property real _leftChromeInset: screenEdgeInset("left")
+    readonly property real _rightChromeInset: screenEdgeInset("right")
+
+    readonly property real _usableScreenW: Math.max(400, _screenW - _leftChromeInset - _rightChromeInset)
+    readonly property real _usableScreenH: Math.max(300, _screenH - _topChromeInset - _bottomChromeInset)
+
     // Modal sized to the screenshot (logical px), clamped between the toolbar's
-    // footprint and 90% of the screen; falls back to 90% until the image loads
+    // footprint and 95% of the usable screen; falls back to 95% until the image loads
     readonly property real _screenW: window.presentationScreen ? window.presentationScreen.width : (Quickshell.screens[0] ? Quickshell.screens[0].width : 1920)
     readonly property real _screenH: window.presentationScreen ? window.presentationScreen.height : (Quickshell.screens[0] ? Quickshell.screens[0].height : 1080)
-    readonly property real _maxModalW: Math.round((config.modalAspectRatio === "portrait" ? Math.min(_screenW, _screenH) : Math.max(_screenW, _screenH)) * 0.9)
-    readonly property real _maxModalH: Math.round((config.modalAspectRatio === "portrait" ? Math.max(_screenW, _screenH) : Math.min(_screenW, _screenH)) * 0.9)
+    readonly property real _maxModalW: Math.round(_usableScreenW * 0.95)
+    readonly property real _maxModalH: Math.round(_usableScreenH * 0.95)
     readonly property bool _toolbarHorizontal: window.toolbarPosition === "top" || window.toolbarPosition === "bottom"
     // Chrome = boardContainer margins plus the edge the toolbar occupies (56px rail + its margin)
     readonly property real _chromeW: Theme.spacingM * 2 + (window.toolbarVisible && !_toolbarHorizontal ? 56 + Theme.spacingM : 0)
@@ -1821,6 +1860,11 @@ Item {
     readonly property bool _shouldScale: !!(window.parentWidget && window.parentWidget.pluginData && window.parentWidget.pluginData.modalScaleToContent)
     modalWidth: _shouldScale && _bgSizeKnown ? Math.round(Helpers.clamp(window.bgImageItem.sourceSize.width / _outputScale + _chromeW, _minModalW, _maxModalW)) : _maxModalW
     modalHeight: _shouldScale && _bgSizeKnown ? Math.round(Helpers.clamp(window.bgImageItem.sourceSize.height / _outputScale + _chromeH, _minModalH, _maxModalH)) : _maxModalH
+    readonly property point modalCustomPosition: {
+        const posX = Math.round(_leftChromeInset + (_usableScreenW - modalWidth) / 2);
+        const posY = Math.round(_topChromeInset + (_usableScreenH - modalHeight) / 2);
+        return Qt.point(posX, posY);
+    }
     targetScreen: {
         const mode = config.modalDisplayTarget;
         const fallback = (Quickshell.screens && Quickshell.screens.length > 0) ? Quickshell.screens[0] : null;
@@ -3204,6 +3248,7 @@ Item {
             console.warn("exportCanvasItem is not initialized yet");
             return;
         }
+        window.exportCanvasItem.exportDpr = (window.presentationScreen && CompositorService.getScreenScale(window.presentationScreen)) || 1;
         const exportWidth = window.hasSelection && window.effectiveBackgroundMode === "none" ? window.cropRect.width : window.canvasWidth;
         const exportHeight = window.hasSelection && window.effectiveBackgroundMode === "none" ? window.cropRect.height : window.canvasHeight;
         window.exportCanvasItem.outputPixelWidth = Math.max(1, Math.round(exportWidth));
@@ -3556,6 +3601,10 @@ Item {
             return window.acceptKeyEvent(event);
         }
         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            if (window.currentTool === "crop") {
+                window.applyCrop();
+                return window.acceptKeyEvent(event);
+            }
             captureActions.performDoneAction();
             return window.acceptKeyEvent(event);
         }
@@ -5073,18 +5122,7 @@ Item {
                             ctx.save();
                             ctx.scale(window.editScale, window.editScale);
 
-                            // 1. Draw Dimming Selection Overlay (only if in crop/ocr/qr mode)
-                            DrawingRenderer.drawSelectionOverlay(ctx, {
-                                isCropMode: window.currentTool === "crop",
-                                isOcrMode: window.currentTool === "ocr" || window.currentTool === "qr",
-                                cropRect: window.cropRect,
-                                ocrRect: window.ocrRect,
-                                canvasWidth: window.canvasWidth,
-                                canvasHeight: window.canvasHeight,
-                                cropAspectRatio: window.cropAspectRatio
-                            }, Theme);
-
-                            // 2. Draw active/selected annotations (translated in edit mode, or clipped in crop mode)
+                            // Draw active/selected annotations (translated in edit mode, or clipped in crop mode)
                             ctx.save();
                             const isBackgroundActive = window.effectiveBackgroundMode !== "none";
                             window.applyEditorAnnotationTransform(ctx, isBackgroundActive);
@@ -5134,6 +5172,12 @@ Item {
                         visible: (config.pluginData["showCanvasBorder"] !== undefined ? config.pluginData["showCanvasBorder"] : true) && (window.effectiveBackgroundMode === "none")
                     }
 
+                    CropSelectionOverlay {
+                        id: cropSelectionOverlay
+                        window: rootWindow
+                        boardContainer: boardContainer
+                    }
+
                     TextInputDialog {
                         id: textInputDialog
                         window: rootWindow
@@ -5166,7 +5210,7 @@ Item {
 
                 Canvas {
                     id: exportCanvas
-                    readonly property real exportDpr: Screen.devicePixelRatio || 1.0
+                    property real exportDpr: 1.0
                     property int outputPixelWidth: 1
                     property int outputPixelHeight: 1
                     visible: true

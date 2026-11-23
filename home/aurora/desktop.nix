@@ -1,7 +1,21 @@
 { config, lib, pkgs, inputs, osConfig, ... }:
 let
+  dmsVersion = lib.removePrefix "v" (lib.trim (builtins.readFile "${inputs.dms}/quickshell/VERSION"));
   # Keep the CLI and patched UI on the same explicitly pinned DMS release.
-  dmsPackage = inputs.dms.lib.mkDmsShell pkgs;
+  dmsPackage = (inputs.dms.lib.mkDmsShell pkgs).overrideAttrs (old: {
+    # The release archive includes the exact Go vendor tree for offline compilation.
+    src = pkgs.fetchurl {
+      url = "https://github.com/duxlabs-dev/dux-shell/releases/download/v${dmsVersion}/dms-cli-${dmsVersion}.tar.gz";
+      hash = "sha256-uqaknYkS57fFVKC+DFWkQkIPh9x14A7lVpiAkq54eBI=";
+    };
+    sourceRoot = "dms-cli-${dmsVersion}";
+    vendorHash = null;
+    nativeBuildInputs = old.nativeBuildInputs ++ [ pkgs.patch ];
+    postInstall = old.postInstall + ''
+      patch --batch --fuzz=0 -d "$out/share/quickshell/dms" -p1 < ${./dms-tray-focus.patch}
+    '';
+  });
+  trayFocusShell = "${dmsPackage}/share/quickshell/dms";
   trayFocus = pkgs.writeShellApplication {
     name = "dms-focus-tray-window";
     runtimeInputs = [ pkgs.python3 pkgs.niri pkgs.systemd ];
@@ -9,20 +23,6 @@ let
       exec python3 ${inputs.dms-tray-focus}/focus-tray-window.py "$@"
     '';
   };
-  trayFocusShell = pkgs.runCommand "dms-shell-tray-focus" {
-    nativeBuildInputs = [ pkgs.patch ];
-  } ''
-    mkdir -p "$out"
-    # GitHub flake sources omit submodules; use the same locked common UI as DMS.
-    cp -a ${inputs.dms}/quickshell/. "$out/"
-    chmod u+w "$out"
-    rm -f "$out/DankCommon"
-    cp -aL ${inputs.dms.inputs.dank-qml-common}/DankCommon "$out/DankCommon"
-    chmod -R u+w "$out"
-    test "$(tr -d '\n' < "$out/VERSION")" = "v1.6.2"
-    cd "$out"
-    patch --batch --fuzz=0 -p1 < ${inputs.dms-tray-focus}/tray-focus.patch
-  '';
 
   initialize = pkgs.writeShellApplication {
     name = "initialize-aurora-dms";

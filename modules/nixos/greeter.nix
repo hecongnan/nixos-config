@@ -3,10 +3,10 @@
   options.my.niri.greeterExtraConfig = lib.mkOption {
     type = lib.types.lines;
     default = "";
-    description = "Target-specific Dank Greeter output and display configuration.";
+    description = "Target-specific Dux Greeter output and display configuration.";
   };
 
-  config.services.displayManager.dms-greeter.compositor.customConfig = ''
+  config.services.displayManager.dux-greeter.compositor.customConfig = ''
     hotkey-overlay {
         skip-at-startup
     }

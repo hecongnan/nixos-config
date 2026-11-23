@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../core/Helpers.js" as Helpers
 
 Column {
@@ -40,11 +40,11 @@ Column {
                     scale: hoverArea.containsMouse ? 1.1 : 1.0
                     Behavior on scale {
                         NumberAnimation {
-                            duration: 100
+                            duration: Theme.shorterDuration
                         }
                     }
 
-                    DankIcon {
+                    DIcon {
                         anchors.centerIn: parent
                         name: "check"
                         size: 14
@@ -81,11 +81,11 @@ Column {
             scale: customHover.containsMouse ? 1.1 : 1.0
             Behavior on scale {
                 NumberAnimation {
-                    duration: 100
+                    duration: Theme.shorterDuration
                 }
             }
 
-            DankIcon {
+            DIcon {
                 anchors.centerIn: parent
                 name: "palette"
                 size: 14

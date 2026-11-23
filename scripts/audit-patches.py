@@ -57,8 +57,12 @@ def dms():
     args = Path('/proc', pid, 'cmdline').read_bytes().decode().split('\0')
     configs = [args[i+1] for i, arg in enumerate(args[:-1]) if arg in ('-c', '--config')]
     assert configs and configs[-1] == shell, 'Running CLI config takes precedence over patched UI'
-    source = (Path(shell) / 'Modules/DankBar/Widgets/SystemTrayBar.qml').read_text()
-    assert source.count('root.activateOrFocusTrayItem(') == 4
+    widgets = Path(shell) / 'Modules/DBar/Widgets'
+    for name, count in [('SystemTrayBar', 2), ('TrayOverflowGrid', 1), ('TrayOverflowMenu', 1)]:
+        source = (widgets / f'{name}.qml').read_text()
+        assert source.count('TrayMenuManager.activateOrFocusTrayItem(') == count, name
+    manager = (Path(shell) / 'Common/TrayMenuManager.qml').read_text()
+    assert 'DMS_TRAY_FOCUS_HELPER' in manager
     assert os.access(helper, os.X_OK)
     assert run('systemctl', '--user', 'is-active', 'dms.service') == 'active'
     return 'Running CLI selects patched UI; all four tray activation paths and helper present'

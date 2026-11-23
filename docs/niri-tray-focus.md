@@ -4,14 +4,16 @@
 https://github.com/hecongnan/dms-niri-tray-focus
 
 当前固定提交：`7d86167f9ffb5183c4f367a31913f60969c5df4e`。
-源码和安装器由独立仓库维护，NixOS 配置自动获取脚本和补丁，无需手工克隆或运行安装器。
+该提交提供 Python 聚焦脚本和原始补丁。
 
-`home/aurora/desktop.nix` 从锁定的 `inputs.dms` 复制 1.6.2 界面，并从该输入锁定的
-`dank-qml-common` 补齐 DankCommon；构建时应用托盘补丁。CLI 也使用相同的锁定 DMS 版本。
-脚本所需的 Python、niri、busctl 由 Nix 包装器提供。用户服务除了设置
-DMS_SHELL_DIR 和 DMS_TRAY_FOCUS_HELPER，还必须显式传入 `--config` 选择补丁界面：
-软件包包装器自带的 `-c` 参数会优先于环境变量，只设置环境变量无法保证加载补丁。
-补丁目前仅适配 DMS 1.6.2，升级版本会在构建时拒绝继续，需要先适配。
+DMS 2.1.2 将托盘组件移到 `Modules/DBar/Widgets`。`home/aurora/dms-tray-focus.patch`
+把原有聚焦逻辑移到 `TrayMenuManager`，覆盖栏内、展开区和溢出菜单中的四条点击路径。
+在 niri 上优先调用脚本聚焦已有窗口，脚本失败时回退到原生托盘激活。
+FlClash 隐藏窗口的恢复继续使用锁定的 Python 脚本。
+
+`home/aurora/desktop.nix` 对锁定的 DMS 包直接应用新版补丁，CLI 和 QML 因此使用同一版本。
+补丁以零模糊匹配应用，若上游修改了相关代码，构建会报错。
+用户服务显式传入 `--config` 并通过 `DMS_TRAY_FOCUS_HELPER` 传入脚本路径。
 
 ## 部署与恢复
 
@@ -36,7 +38,7 @@ ExecStart 的 `--config` 也应指向同一补丁界面。还需检查本次启�
 
 ## 更新补丁
 
-修改 flake.nix 中固定的独立补丁提交，更新 flake.lock，先构建验证再部署。
+升级 DMS 时检查本地 QML 补丁是否仍覆盖全部托盘激活路径。更新 Python 脚本时修改 flake.nix 中固定的独立补丁提交并更新 flake.lock。先构建验证再部署。
 
 ## 验证
 

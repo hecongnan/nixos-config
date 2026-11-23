@@ -1,0 +1,61 @@
+--- a/Common/TrayMenuManager.qml
++++ b/Common/TrayMenuManager.qml
+@@ -5,4 +5,5 @@
+ import QtQuick
+ import qs.Common
++import qs.Services
+ import "../Services/IconThemeIndex.js" as IconIndex
+ 
+@@ -19,4 +20,18 @@
+         const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
+         return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : [];
++    }
++
++    // Tray activation does not reliably focus existing niri windows.
++    function activateOrFocusTrayItem(trayItem) {
++        const helper = Quickshell.env("DMS_TRAY_FOCUS_HELPER");
++        if (!CompositorService.isNiri || !helper) {
++            trayItem.activate();
++            return;
++        }
++        Proc.runCommand("tray-focus-" + trayItem.id,
++            [helper, trayItem.id], (output, exitCode) => {
++                if (exitCode !== 0)
++                    trayItem.activate();
++            }, 0, 10000);
+     }
+ 
+--- a/Modules/DBar/Widgets/SystemTrayBar.qml
++++ b/Modules/DBar/Widgets/SystemTrayBar.qml
+@@ -51,5 +51,5 @@
+             return;
+         if (!trayItem.onlyMenu) {
+-            trayItem.activate();
++            TrayMenuManager.activateOrFocusTrayItem(trayItem);
+             return;
+         }
+@@ -775,5 +775,5 @@
+                         return;
+                     if (!delegateRoot.trayItem.onlyMenu) {
+-                        delegateRoot.trayItem.activate();
++                        TrayMenuManager.activateOrFocusTrayItem(delegateRoot.trayItem);
+                         return;
+                     }
+--- a/Modules/DBar/Widgets/TrayOverflowGrid.qml
++++ b/Modules/DBar/Widgets/TrayOverflowGrid.qml
+@@ -157,5 +157,5 @@
+ 
+                     if (mouse.button === Qt.LeftButton && !overflowItemRoot.trayItem.onlyMenu) {
+-                        overflowItemRoot.trayItem.activate();
++                        TrayMenuManager.activateOrFocusTrayItem(overflowItemRoot.trayItem);
+                         root.bar.menuOpen = false;
+                         return;
+--- a/Modules/DBar/Widgets/TrayOverflowMenu.qml
++++ b/Modules/DBar/Widgets/TrayOverflowMenu.qml
+@@ -82,5 +82,5 @@
+ 
+                 if (!item.onlyMenu) {
+-                    item.activate();
++                    TrayMenuManager.activateOrFocusTrayItem(item);
+                     root.hide();
+                     return;

@@ -1,6 +1,6 @@
 import QtQuick
 import qs.Common
-import qs.Widgets
+import qs.DCommon.Widgets
 import "../core/Helpers.js" as Helpers
 import "../.."
 
@@ -50,7 +50,7 @@ Item {
         Transition {
             NumberAnimation {
                 properties: "opacity,scale"
-                duration: 150
+                duration: Theme.shortDuration
                 easing.type: Easing.OutQuad
             }
         }
@@ -209,7 +209,7 @@ Item {
                     opacity: 0.6
                 }
 
-                DankIcon {
+                DIcon {
                     name: {
                         return config.getToolIcon(modelData.tool);
                     }
@@ -253,12 +253,12 @@ Item {
         scale: root.selectedIndex === -2 ? 1.05 : 1.0
         Behavior on scale {
             NumberAnimation {
-                duration: 100
+                duration: Theme.shorterDuration
             }
         }
         Behavior on border.width {
             NumberAnimation {
-                duration: 100
+                duration: Theme.shorterDuration
             }
         }
 
@@ -266,7 +266,7 @@ Item {
             anchors.centerIn: parent
             spacing: 2
 
-            DankIcon {
+            DIcon {
                 name: {
                     if (root.selectedIndex === -2)
                         return "near_me";
