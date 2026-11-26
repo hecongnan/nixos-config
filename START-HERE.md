@@ -80,6 +80,18 @@ git commit -m "调整桌面快捷键"
 应保存整个配置、`lazy-lock.json`、必要的插件/解析器及编译结果；锁文件不能替代离线插件归档。
 DMS 设置、`~/.config/niri/dms`、FlClash 订阅、Rime 用户词库和 Atuin 数据也不会自动同步回仓库。
 
+### VS Code 和共享桌面偏好
+
+新机应用 Flake 后，Home Manager 会写入 VS Code 的用户设置，并在用户任务文件缺失时
+初始化 C++ 编译任务。Night Owl 和 Seti 文件夹图标随系统构建安装。第一次从桌面入口
+打开 VS Code 时，会在后台从 Marketplace 恢复清单中缺失的扩展，需联网。
+编辑器设置、C++ 任务和扩展版本清单位于 `assets/vscode/`。
+账号、Cookie 和 VS Code 工作区数据留在本机。已有用户任务可在本机继续编辑。
+
+共享 Kitty 偏好采用笔记本的 12 pt 和配色。DMS、Niri 片段和 Fcitx5 通知偏好在
+文件缺失时使用笔记本模板初始化。显示模式按本机自动检测，鼠标电量组件在系统可读取
+电量时显示数值。
+
 ## 保存副本与隐私
 
 源码远端为 GitHub 私有仓库 `hecongnan/nixos-config`，本地 remote 名称为 `origin`。

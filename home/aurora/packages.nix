@@ -7,7 +7,7 @@ with pkgs; [
   # Native package priorities match the profile (notably LibreOffice and Neovim).
   btop fastfetch ffmpeg google-chrome gpu-screen-recorder
   imagemagick img2pdf libreoffice neovim nodejs
-  qq scrcpy tesseract vim vlc vscode wechat-uos
+  qq scrcpy tesseract vim vlc wechat-uos
   wf-recorder wireshark wpsoffice zbar
   (import ../../pkgs/nvim-system-tools { inherit pkgs; })
 ] ++ lib.optionals osConfig.my.features.terminalTools.enable [

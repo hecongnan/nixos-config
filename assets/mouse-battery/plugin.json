@@ -1,0 +1,14 @@
+{
+    "id": "mouseBattery",
+    "name": "鼠标电量",
+    "description": "在桌面和 DUX 栏显示无线鼠标的电量",
+    "version": "1.0.0",
+    "type": "composite",
+    "capabilities": ["dankbar-widget", "desktop-widget"],
+    "icon": "mouse",
+    "components": {
+        "widget": "./MouseBatteryBar.qml",
+        "desktop": "./MouseBatteryDesktop.qml"
+    },
+    "requires_dms": ">=2.0.0"
+}

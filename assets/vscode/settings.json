@@ -1,0 +1,53 @@
+{
+  "animations.Install-Method": "Apc Customize UI++",
+  "labuladong-leetcode.defaultLanguage": "cpp",
+  "workbench.colorTheme": "Night Owl",
+  "editor.fontFamily": "JetBrains Mono",
+  "terminal.integrated.fontFamily": "'JetBrains Mono', 'FiraCode Nerd Font Mono', monospace",
+  "editor.lineHeight": 1.8,
+  "workbench.tree.indent": 16,
+  "workbench.tree.renderIndentGuides": "always",
+  "editor.minimap.showSlider": "always",
+  "workbench.iconTheme": "vs-seti-folder",
+  "chat.viewSessions.orientation": "stacked",
+  "editor.mouseWheelZoom": true,
+  "terminal.integrated.mouseWheelZoom": false,
+  "workbench.colorCustomizations": {
+    "[Night Owl]": {
+      "editor.background": "#011627"
+    }
+  },
+  "files.simpleDialog.enable": true,
+  "vsintellicode.python.completionsEnabled": false,
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "C++: g++ 快速运行当前文件",
+        "type": "cppdbg",
+        "request": "launch",
+        "args": [],
+        "cwd": "${fileDirname}",
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "stopAtEntry": false,
+        "program": "${fileDirname}/${fileBasenameNoExtension}.run",
+        "preLaunchTask": "C++: Build optimized active file (g++)",
+        "isDefault": true
+      },
+      {
+        "name": "C++: g++ 调试当前文件",
+        "type": "cppdbg",
+        "request": "launch",
+        "args": [],
+        "cwd": "${fileDirname}",
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "stopAtEntry": false,
+        "program": "${fileDirname}/${fileBasenameNoExtension}",
+        "preLaunchTask": "C++: Build active file (g++)"
+      }
+    ]
+  },
+  "chat.disableAIFeatures": true
+}

@@ -1,0 +1,4 @@
+binds {
+    Mod+Period repeat=false hotkey-overlay-title="电源管理" { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
+    Mod+Shift+F10 repeat=false hotkey-overlay-title="随机下载动漫壁纸" { spawn "dux-random-wallpaper"; }
+}

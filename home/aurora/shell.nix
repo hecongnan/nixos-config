@@ -264,9 +264,10 @@ in
   '';
   programs.kitty = {
     enable = true;
+    extraConfig = "\n# Laptop appearance\ninclude laptop-appearance.conf";
     settings = {
       font_family = "FiraCode Nerd Font";
-      font_size = 11;
+      font_size = 12;
       confirm_os_window_close = 0;
       enable_audio_bell = false;
       background = "#282a36";
@@ -292,4 +293,5 @@ in
       color15 = "#ffffff";
     };
   };
+  xdg.configFile."kitty/laptop-appearance.conf".source = ../../assets/kitty-appearance.conf;
 }

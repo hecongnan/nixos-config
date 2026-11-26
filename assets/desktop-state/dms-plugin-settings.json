@@ -1,5 +1,8 @@
 {
   "quickCapture": {
     "enabled": true
+  },
+  "mouseBattery": {
+    "enabled": true
   }
 }

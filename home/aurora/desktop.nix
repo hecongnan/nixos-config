@@ -23,6 +23,19 @@ let
       exec python3 ${inputs.dms-tray-focus}/focus-tray-window.py "$@"
     '';
   };
+  randomWallpaper = pkgs.writeShellApplication {
+    name = "dux-random-wallpaper";
+    runtimeInputs = [ dmsPackage pkgs.coreutils pkgs.curl pkgs.imagemagick pkgs.libnotify ];
+    text = builtins.readFile ../../assets/scripts/dux-random-wallpaper.sh;
+  };
+  mouseBattery = pkgs.runCommand "dms-mouse-battery" { } ''
+    mkdir -p "$out"
+    cp -r ${../../assets/mouse-battery}/. "$out/"
+    chmod u+w "$out/MouseBatteryIndicator.qml" "$out/read-logitech-battery.sh"
+    substituteInPlace "$out/MouseBatteryIndicator.qml" --replace-fail '@bash@' '${pkgs.bash}/bin/bash'
+    substituteInPlace "$out/read-logitech-battery.sh" --replace-fail '@solaar@' '${lib.getExe pkgs.solaar}'
+    patchShebangs "$out/read-logitech-battery.sh"
+  '';
 
   initialize = pkgs.writeShellApplication {
     name = "initialize-aurora-dms";
@@ -32,7 +45,8 @@ let
         --snapshot ${../../assets/desktop-state} \
         --config-home ${lib.escapeShellArg config.xdg.configHome} \
         --state-home ${lib.escapeShellArg config.xdg.stateHome} \
-        --wallpaper ${lib.escapeShellArg "${config.home.homeDirectory}/.background/wallpaper.svg"}
+        --wallpaper ${lib.escapeShellArg "${config.home.homeDirectory}/.background/wallpaper.svg"} \
+        --mouse-battery ${mouseBattery}
       install -d -m 700 ${lib.escapeShellArg "${config.home.homeDirectory}/Pictures/Screenshots"}
     '';
   };
@@ -66,7 +80,7 @@ in
   qt = { enable = true; platformTheme.name = "qtct"; };
   xdg.configFile."qt6ct/qt6ct.conf".text = "[Appearance]\nicon_theme=Papirus-Dark\n";
   xdg.configFile."DankMaterialShell/plugins/quickCapture".source = ../../vendor/quickCapture;
-  home.packages = with pkgs; [ papirus-icon-theme adw-gtk3 satty grim slurp xwayland-satellite ];
+  home.packages = with pkgs; [ papirus-icon-theme adw-gtk3 satty grim slurp xwayland-satellite randomWallpaper ];
   home.sessionVariables.QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
   systemd.user.sessionVariables.QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
   xdg.configFile."niri/config.kdl".source = ../../assets/niri.kdl;
