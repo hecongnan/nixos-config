@@ -86,9 +86,9 @@ in
   config = lib.mkIf config.my.features.graphicalBoot.enable {
     boot.loader = {
       # Boot straight through; press Esc during the 1s window for the menu.
-      timeout = 1;
+      timeout = lib.mkDefault 1;
       grub = {
-        timeoutStyle = "hidden";
+        timeoutStyle = lib.mkDefault "hidden";
         # Keep the firmware mode so Plymouth starts without a mode switch.
         gfxpayloadEfi = "keep";
       };

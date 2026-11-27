@@ -2,23 +2,16 @@
 {
   imports = [
     ../../modules/nixos/docker.nix
-    ./classroom.nix
-  ] ++ [
     ./boot.nix
     ./machine.nix
     ./features.nix
     ./hardware-configuration.nix
     ./platform.nix
     ./display.nix
-    ../../modules/nixos/base.nix
-    ../../modules/nixos/desktop.nix
-    ../../modules/nixos/greeter.nix
-    ../../modules/nixos/graphical-boot
-    ../../modules/nixos/computer-use
-    ../../modules/nixos/features.nix
-    ../../modules/nixos/flclash.nix
+    ../../modules/nixos
+    # Keep the classroom packages in their existing merge order.
+    ./classroom.nix
     ../../modules/nixos/disk.nix
     inputs.disko.nixosModules.disko
-    inputs.home-manager.nixosModules.home-manager
   ];
 }

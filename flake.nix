@@ -47,6 +47,11 @@
         specialArgs = { inherit inputs; };
         modules = [ ./hosts/aurora ];
       };
+      laptop = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = [ ./hosts/laptop ];
+      };
       preview = host.extendModules { modules = [ ./tests/preview.nix ]; };
       partitionTestHost = host.extendModules {
         modules = [{
@@ -60,6 +65,7 @@
     in
     {
       nixosConfigurations.aurora = host;
+      nixosConfigurations.laptop = laptop;
       # Only for --vm-test; never install this entry on a real target.
       nixosConfigurations.aurora-preview = preview;
       packages.${system}.flclash = pkgs.callPackage ./pkgs/flclash { };

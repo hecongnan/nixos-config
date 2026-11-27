@@ -25,3 +25,6 @@ credentials.json
 *.sqlite
 *.sqlite3
 *.db
+
+# Laptop hardware and boot configuration
+/hosts/laptop/local/
